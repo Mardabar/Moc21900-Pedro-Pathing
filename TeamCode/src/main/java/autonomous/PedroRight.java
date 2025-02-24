@@ -31,7 +31,8 @@ public class PedroRight extends OpMode {
     Servo imaTouchU;
 
     private ElapsedTime movementTimer = new ElapsedTime();
-    private final double ticks_in_degree = 537.7;
+    private final double ticks_in_degree = 537.7; // ticks in degree for 312 motors
+    private final double rotat_ticks_in_degree = 3895.9; // ticks in degree for the 43 rpm motor
     static final double COUNTS_PER_MOTOR_REV = 280;
     static final double DRIVE_GEAR_REDUCTION = 2.95;
     static final double WHEEL_DIAMETER_INCHES = 4.0;
@@ -92,7 +93,7 @@ public class PedroRight extends OpMode {
     private LinearOpMode OpMode;
     public DcMotor armMotor1, armMotor2, elbow;
     // public  RunAction toZero, toChamber;
-    public PIDController PickmeupPID, elbowPID;
+
     public Boolean armDone;
     public int pos;
     public static double p = 0.01, i = 0, d = 0.0001;
@@ -167,8 +168,8 @@ public class PedroRight extends OpMode {
             case 0: // Move from start to scoring position
                 follower.followPath(scorePre);
                 follower.setMaxPower(.8);
-                setRotatTarget(950);
-                setpickmeupTarget(500);
+                setRotatTarget(1600);
+                setpickmeupTarget(450);
                 setPathState(1);
                 break;
 
@@ -178,8 +179,8 @@ public class PedroRight extends OpMode {
                     follower.followPath(movetofirst);
                     imaTouchU.setPosition(.58);
                     ankel.setPosition(.658);
-                    setRotatTarget(300);
-                    setpickmeupTarget(10);
+                    //setRotatTarget(10);
+                    //setpickmeupTarget(10);
                     setPathState(2);
                 }
                 break;
@@ -295,10 +296,22 @@ public class PedroRight extends OpMode {
         Rlin.setDirection(DcMotor.Direction.FORWARD);
         rotat.setDirection(DcMotor.Direction.FORWARD);
 
+        pickMeUp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Llin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotat.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        pickMeUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Llin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotat.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         clampClaw();
         moveClaw();
         ankel.setPosition(.6); // was .658
         imaTouchU.setPosition(.16);
+        setRotatTarget(1600);
+
 
 
 
@@ -330,7 +343,7 @@ public class PedroRight extends OpMode {
 
         double Llff = Math.cos(Math.toRadians(LlinTarget / ticks_in_degree)) * f;
         double Rlff = Math.cos(Math.toRadians(RlinTarget / ticks_in_degree)) * f;
-        double rff = Math.cos(Math.toRadians(rotatTarget / ticks_in_degree)) * f;
+        double rff = Math.cos(Math.toRadians(rotatTarget / rotat_ticks_in_degree)) * f;
         double mff = Math.cos(Math.toRadians(pickmeupTarget / ticks_in_degree)) * f;
 
         double LlinPower = Llff + Llpid;
@@ -348,6 +361,8 @@ public class PedroRight extends OpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getTotalHeading());
+        telemetry.addData("rotat pos", rotatPos);
+        telemetry.addData("rotat target pos", rotatTarget);
         telemetry.update();
     }
 
