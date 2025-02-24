@@ -166,10 +166,10 @@ public class PedroRight extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Move from start to scoring position
-                follower.followPath(scorePre);
                 follower.setMaxPower(.8);
                 setRotatTarget(1600);
                 setpickmeupTarget(450);
+                follower.followPath(scorePre);
                 setPathState(1);
                 break;
 
@@ -180,7 +180,7 @@ public class PedroRight extends OpMode {
                     imaTouchU.setPosition(.58);
                     ankel.setPosition(.658);
                     //setRotatTarget(10);
-                    //setpickmeupTarget(10);
+                    setpickmeupTarget(10);
                     setPathState(2);
                 }
                 break;
@@ -308,7 +308,7 @@ public class PedroRight extends OpMode {
 
         clampClaw();
         moveClaw();
-        ankel.setPosition(.6); // was .658
+        ankel.setPosition(.658); // was .658
         imaTouchU.setPosition(.16);
         setRotatTarget(1600);
 
