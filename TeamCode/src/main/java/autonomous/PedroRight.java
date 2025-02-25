@@ -1,5 +1,6 @@
 package autonomous;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -20,6 +21,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
+@Config
 @Autonomous(name = "Pedro Right", group = "autonomous")
 public class PedroRight extends OpMode {
 
@@ -47,7 +49,7 @@ public class PedroRight extends OpMode {
     private int pathState;
 
     private final Pose startPose = new Pose(8.5, 70, Math.toRadians(0));  // Starting position
-    private final Pose scoreprePose = new Pose(40, 70, Math.toRadians(0)); // Scoring position
+    private final Pose scoreprePose = new Pose(34, 70, Math.toRadians(0)); // Scoring position
     private final Pose linewith1Pose = new Pose(30,70, Math.toRadians(90)); // move robot back a bit after score pre
 
     //private final Pose cuvrewith1Pose = new Pose()
@@ -81,7 +83,7 @@ public class PedroRight extends OpMode {
     private final Pose control2 = new Pose(10,64);
     private final Pose control3 = new Pose(15,72);
     private final Pose linescore2 = new Pose(30,68, Math.toRadians(0));
-    private final Pose scorespec2 = new Pose(38,68, Math.toRadians(355));
+    private final Pose scorespec2 = new Pose(38,68, Math.toRadians(0));
 
 
     private final Pose scorespec3 = new Pose(38,66, Math.toRadians(0));
@@ -105,16 +107,16 @@ public class PedroRight extends OpMode {
 
    // private Path scorePre, park;
 
-    private PathChain scorePre, movetofirst, pushinsamps, pickspecup, line2score;
+    private PathChain scorePre, movetofirst, pushinsamps, pickspecup, line2score, score2spec;
 
     private LinearOpMode OpMode;
-    public DcMotor armMotor1, armMotor2, elbow;
-    // public  RunAction toZero, toChamber;
 
     public Boolean armDone;
     public int pos;
-    public static double p = 0.01, i = 0, d = 0.0001;
-    public static double f = 0.01;
+    public static double pR = 0.0085, iR = 0.01, dR = 0.0001;
+    public static double fR = 0;
+    public static double p = 0.00067, i = 0.01, d = 0.0005;
+    public static double f = 0;
 
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
     public static double LlinTarget;
@@ -183,10 +185,10 @@ public class PedroRight extends OpMode {
                 .setLinearHeadingInterpolation(pickupspec2Pose.getHeading(), linescore2.getHeading())
                 .build();
 
-        /*score2spec = follower.pathBuilder()
-                /*.addPath(new BezierCurve(new Point(control2), new Point(control3), new Point(scorespec2)))
-                .setLinearHeadingInterpolation(pickupspec2Pose.getHeading(), control3.getHeading(), scorespec2.getHeading())
-                .build(); */
+        score2spec = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(linescore2), new Point(scorespec2)))
+                .setLinearHeadingInterpolation(linescore2.getHeading(), scorespec2.getHeading())
+                .build();
 
 
 
@@ -199,14 +201,18 @@ public class PedroRight extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Move from start to scoring position
-                follower.setMaxPower(1);
-                setRotatTarget(1300);
-                setpickmeupTarget(600);
+                follower.setMaxPower(.8);
+                setRotatTarget(1500);
+                //setRotatTarget(1400);
+                //setpickmeupTarget(500);
                 follower.followPath(scorePre);
                 setPathState(1);
                 break;
-
-            case 1: // Wait until the robot is near the scoring position
+              case 1:
+                setRotatTarget(1200);
+                setPathState(2);
+                break;
+            /*case 2: // Wait until the robot is near the scoring position
                 if (!follower.isBusy()) {
                     follower.setMaxPower(1);
                     follower.followPath(movetofirst);
@@ -216,7 +222,7 @@ public class PedroRight extends OpMode {
                     setPathState(2);
                 }
                 break;
-            case 2: // bot strafes to right of sub zone
+            case 3: // bot strafes to right of sub zone
                 if (!follower.isBusy()) {
                     follower.followPath(pushinsamps);
                     setRotatTarget(500);
@@ -225,15 +231,15 @@ public class PedroRight extends OpMode {
                     setPathState(3);
                 }
                 break;
-            case 3:
+            case 4:
                 if (!follower.isBusy()) {
                     follower.followPath(pickspecup);
                     setPathState(4);
                 }
                 break;
-            case 4: // bot
+            case 5: // bot
                 if (!follower.isBusy()) {
-                    ankel.setPosition(.6);
+                    ankel.setPosition(.658); // was .658
                     imaTouchU.setPosition(.16);
                     setPathState(5);
                     setRotatTarget(1300);
@@ -241,6 +247,15 @@ public class PedroRight extends OpMode {
                     follower.followPath(line2score);
                 }
                 break;
+            case 6:
+                if (!follower.isBusy()) {
+                    ankel.setPosition(.658); // was .658
+                    imaTouchU.setPosition(.16);
+                    setRotatTarget(1300);
+                    setpickmeupTarget(450);
+                    follower.followPath(score2spec);
+                    setPathState(6);
+                }
            /* case 5:
                 if (!follower.isBusy()) {
                     setRotatTarget(1300);
@@ -348,7 +363,7 @@ public class PedroRight extends OpMode {
         // setting motor pid values
         LlinPID = new PIDController(p,i,d);
         RlinPID = new PIDController(p,i,d);
-        rotatPID = new PIDController(p, i, d);
+        rotatPID = new PIDController(pR, iR, dR);
         pickmeupPID = new PIDController(p, i, d);
 
         pickMeUp.setDirection(DcMotor.Direction.REVERSE);
@@ -368,7 +383,7 @@ public class PedroRight extends OpMode {
 
         clampClaw();
         moveClaw();
-        ankel.setPosition(.658); // was .658
+        ankel.setPosition(.62); // was .658
         imaTouchU.setPosition(.16);
 
 
@@ -387,7 +402,7 @@ public class PedroRight extends OpMode {
         autonomousPathUpdate();
         LlinPID.setPID(p,i,d);
         RlinPID.setPID(p,i,d);
-        rotatPID.setPID(p,i,d);
+        rotatPID.setPID(pR,iR,dR);
         pickmeupPID.setPID(p,i,d);
 
         int LlinPos = Llin.getCurrentPosition();
@@ -402,7 +417,7 @@ public class PedroRight extends OpMode {
 
         double Llff = Math.cos(Math.toRadians(LlinTarget / ticks_in_degree)) * f;
         double Rlff = Math.cos(Math.toRadians(RlinTarget / ticks_in_degree)) * f;
-        double rff = Math.cos(Math.toRadians(rotatTarget / rotat_ticks_in_degree)) * f;
+        double rff = Math.cos(Math.toRadians(rotatTarget / rotat_ticks_in_degree)) * fR;
         double mff = Math.cos(Math.toRadians(pickmeupTarget / ticks_in_degree)) * f;
 
         double LlinPower = Llff + Llpid;

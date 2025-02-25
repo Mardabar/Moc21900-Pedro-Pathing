@@ -31,6 +31,10 @@ public class PedroLeft extends OpMode {
     Servo ankel;
     Servo imaTouchU;
 
+    ElapsedTime timer = new ElapsedTime();
+    double dur = 1200;
+    int timerCount = -1;
+
     private ElapsedTime movementTimer = new ElapsedTime();
     private final double ticks_in_degree = 537.7;
     static final double COUNTS_PER_MOTOR_REV = 280;
@@ -46,7 +50,7 @@ public class PedroLeft extends OpMode {
      * It is used by the pathUpdate method. */
     private int pathState;
 
-    private final Pose startPose = new Pose(10.00, 108.29, Math.toRadians(90));  // Starting position
+    private final Pose startPose = new Pose(8.20, 104.20, Math.toRadians(90));  // Starting position
     private final Pose scorePose = new Pose(15.45, 129.36, Math.toRadians(135)); // Scoring position
 
     private final Pose lineSamp2Pose = new Pose(33.83, 118.36, Math.toRadians(0)); // move robot back a bit after score pre
@@ -178,35 +182,54 @@ public class PedroLeft extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Move from start to scoring position
-                follower.followPath(scoreFirstSamp);
-                follower.setMaxPower(0.6);
+                if (!follower.isBusy() && timerCount == -1) {
+                    follower.followPath(scoreFirstSamp);
+                    follower.setMaxPower(0.6);
+                    dur = 200;
+                    timer.reset();
 
-                imaTouchU.setPosition(0.13);
-                setLlinTarget(3200);
-                setRlinTarget(3200);
-                setRotatTarget(2080);
-                ankel.setPosition(0.568);
+                    imaTouchU.setPosition(0.13);
+                    setLlinTarget(3200);
+                    setRlinTarget(3200);
+                    setRotatTarget(1600);
+                    ankel.setPosition(0.568);
+                }
 
-                setPathState(1);
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
+
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 1200;
+                    timerCount = -1;
+                    setPathState(1);
+                }
                 break;
 
             case 1:
-                ElapsedTime timer = new ElapsedTime();
-                double dur = 1200;
-                setpickmeupTarget(960);
+                if (timerCount == -1){
+                    setpickmeupTarget(960);
+                    timer.reset();
+                    timerCount = 0;
+                }
 
-                if (timer.milliseconds() >= dur){
+                if (timer.milliseconds() >= dur && timerCount == 0){
                     imaTouchU.setPosition(0.56);
                     dur = 600;
+                    timerCount = 1;
                     timer.reset();
                 }
-                if (timer.milliseconds() >= dur){
+                if (timer.milliseconds() >= dur && timerCount == 1){
+                    setpickmeupTarget(80);
                     dur = 1200;
+                    timerCount = 2;
                     timer.reset();
                 }
-                setpickmeupTarget(80);
-                if (timer.milliseconds() >= dur){
+                if (timer.milliseconds() >= dur && timerCount == 2){
+                    setPathState(2);
+                    timerCount = -1;
                 }
+                break;
 
             case 2: // Wait until the robot is near the scoring position
                 if (!follower.isBusy()) {
@@ -219,7 +242,7 @@ public class PedroLeft extends OpMode {
                     setpickmeupTarget(960);
                     ankel.setPosition(0.567);
 
-                    setPathState(2);
+                    setPathState(3);
                 }
                 break;
             case 3: // bot strafes to right of sub zone

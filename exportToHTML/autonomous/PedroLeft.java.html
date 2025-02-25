@@ -1,0 +1,455 @@
+<html>
+<head>
+<title>PedroLeft.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #cf8e6d;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+.s5 { color: #5f826b; font-style: italic;}
+.s6 { color: #7a7e85;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+PedroLeft.java</font>
+</center></td></tr></table>
+<pre>
+<span class="s1">package </span><span class="s0">autonomous</span><span class="s2">;</span>
+
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">Follower</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">localization</span><span class="s2">.</span><span class="s0">Pose</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">pathgen</span><span class="s2">.</span><span class="s0">BezierCurve</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">pathgen</span><span class="s2">.</span><span class="s0">BezierLine</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">pathgen</span><span class="s2">.</span><span class="s0">Path</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">pathgen</span><span class="s2">.</span><span class="s0">PathChain</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">pathgen</span><span class="s2">.</span><span class="s0">Point</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">util</span><span class="s2">.</span><span class="s0">Constants</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">pedropathing</span><span class="s2">.</span><span class="s0">util</span><span class="s2">.</span><span class="s0">Timer</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">qualcomm</span><span class="s2">.</span><span class="s0">robotcore</span><span class="s2">.</span><span class="s0">eventloop</span><span class="s2">.</span><span class="s0">opmode</span><span class="s2">.</span><span class="s0">Autonomous</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">qualcomm</span><span class="s2">.</span><span class="s0">robotcore</span><span class="s2">.</span><span class="s0">eventloop</span><span class="s2">.</span><span class="s0">opmode</span><span class="s2">.</span><span class="s0">LinearOpMode</span><span class="s2">;</span>
+<span class="s1">import  </span><span class="s0">com</span><span class="s2">.</span><span class="s0">qualcomm</span><span class="s2">.</span><span class="s0">robotcore</span><span class="s2">.</span><span class="s0">eventloop</span><span class="s2">.</span><span class="s0">opmode</span><span class="s2">.</span><span class="s0">OpMode</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">qualcomm</span><span class="s2">.</span><span class="s0">robotcore</span><span class="s2">.</span><span class="s0">hardware</span><span class="s2">.</span><span class="s0">DcMotor</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">qualcomm</span><span class="s2">.</span><span class="s0">robotcore</span><span class="s2">.</span><span class="s0">hardware</span><span class="s2">.</span><span class="s0">Servo</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">qualcomm</span><span class="s2">.</span><span class="s0">robotcore</span><span class="s2">.</span><span class="s0">util</span><span class="s2">.</span><span class="s0">ElapsedTime</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">com</span><span class="s2">.</span><span class="s0">arcrobotics</span><span class="s2">.</span><span class="s0">ftclib</span><span class="s2">.</span><span class="s0">controller</span><span class="s2">.</span><span class="s0">PIDController</span><span class="s2">;</span>
+
+<span class="s1">import </span><span class="s0">pedroPathing</span><span class="s2">.</span><span class="s0">constants</span><span class="s2">.</span><span class="s0">FConstants</span><span class="s2">;</span>
+<span class="s1">import </span><span class="s0">pedroPathing</span><span class="s2">.</span><span class="s0">constants</span><span class="s2">.</span><span class="s0">LConstants</span><span class="s2">;</span>
+
+<span class="s0">@Autonomous</span><span class="s2">(</span><span class="s0">name </span><span class="s2">= </span><span class="s3">&quot;Pedro Left&quot;</span><span class="s2">, </span><span class="s0">group </span><span class="s2">= </span><span class="s3">&quot;autonomous&quot;</span><span class="s2">)</span>
+<span class="s1">public class </span><span class="s0">PedroLeft </span><span class="s1">extends </span><span class="s0">OpMode </span><span class="s2">{</span>
+
+    <span class="s1">private </span><span class="s0">DcMotor Rlin </span><span class="s2">= </span><span class="s1">null</span><span class="s2">;</span>
+    <span class="s1">private </span><span class="s0">DcMotor Llin </span><span class="s2">= </span><span class="s1">null</span><span class="s2">;</span>
+    <span class="s1">private </span><span class="s0">DcMotor pickMeUp </span><span class="s2">= </span><span class="s1">null</span><span class="s2">;</span>
+    <span class="s1">private </span><span class="s0">DcMotor rotat </span><span class="s2">= </span><span class="s1">null</span><span class="s2">;</span>
+    <span class="s0">Servo ankel</span><span class="s2">;</span>
+    <span class="s0">Servo imaTouchU</span><span class="s2">;</span>
+
+    <span class="s1">private </span><span class="s0">ElapsedTime movementTimer </span><span class="s2">= </span><span class="s1">new </span><span class="s0">ElapsedTime</span><span class="s2">();</span>
+    <span class="s1">private final double </span><span class="s0">ticks_in_degree </span><span class="s2">= </span><span class="s4">537.7</span><span class="s2">;</span>
+    <span class="s1">static final double </span><span class="s0">COUNTS_PER_MOTOR_REV </span><span class="s2">= </span><span class="s4">280</span><span class="s2">;</span>
+    <span class="s1">static final double </span><span class="s0">DRIVE_GEAR_REDUCTION </span><span class="s2">= </span><span class="s4">2.95</span><span class="s2">;</span>
+    <span class="s1">static final double </span><span class="s0">WHEEL_DIAMETER_INCHES </span><span class="s2">= </span><span class="s4">4.0</span><span class="s2">;</span>
+    <span class="s1">static final double </span><span class="s0">COUNTS_PER_INCH </span><span class="s2">= (</span><span class="s0">COUNTS_PER_MOTOR_REV </span><span class="s2">* </span><span class="s0">DRIVE_GEAR_REDUCTION</span><span class="s2">) / (</span><span class="s0">WHEEL_DIAMETER_INCHES </span><span class="s2">* </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">PI</span><span class="s2">);</span>
+
+
+    <span class="s1">private </span><span class="s0">Follower follower</span><span class="s2">;</span>
+    <span class="s1">private </span><span class="s0">Timer pathTimer</span><span class="s2">, </span><span class="s0">actionTimer</span><span class="s2">, </span><span class="s0">opmodeTimer</span><span class="s2">;</span>
+
+    <span class="s5">/** This is the variable where we store the state of our auto.</span>
+     <span class="s5">* It is used by the pathUpdate method. */</span>
+    <span class="s1">private int </span><span class="s0">pathState</span><span class="s2">;</span>
+
+    <span class="s1">private final </span><span class="s0">Pose startPose </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Pose</span><span class="s2">(</span><span class="s4">10.00</span><span class="s2">, </span><span class="s4">108.29</span><span class="s2">, </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s4">90</span><span class="s2">));  </span><span class="s6">// Starting position</span>
+    <span class="s1">private final </span><span class="s0">Pose scorePose </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Pose</span><span class="s2">(</span><span class="s4">15.45</span><span class="s2">, </span><span class="s4">129.36</span><span class="s2">, </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s4">135</span><span class="s2">)); </span><span class="s6">// Scoring position</span>
+
+    <span class="s1">private final </span><span class="s0">Pose lineSamp2Pose </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Pose</span><span class="s2">(</span><span class="s4">33.83</span><span class="s2">, </span><span class="s4">118.36</span><span class="s2">, </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s4">0</span><span class="s2">)); </span><span class="s6">// move robot back a bit after score pre</span>
+    <span class="s1">private final </span><span class="s0">Pose lineSamp3Pose </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Pose</span><span class="s2">(</span><span class="s4">33.83</span><span class="s2">, </span><span class="s4">128.36</span><span class="s2">, </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s4">0</span><span class="s2">));</span>
+    <span class="s1">private final </span><span class="s0">Pose lineSamp4Pose </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Pose</span><span class="s2">(</span><span class="s4">38.52</span><span class="s2">, </span><span class="s4">131.82</span><span class="s2">, </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s4">42</span><span class="s2">));</span>
+
+    <span class="s1">private final </span><span class="s0">Pose finishPose </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Pose</span><span class="s2">(</span><span class="s4">59.36</span><span class="s2">, </span><span class="s4">108.18</span><span class="s2">, </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(-</span><span class="s4">90</span><span class="s2">));</span>
+    <span class="s1">private final </span><span class="s0">Pose finishControlPose </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Pose</span><span class="s2">(</span><span class="s4">57.72</span><span class="s2">, </span><span class="s4">129.01</span><span class="s2">, </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(-</span><span class="s4">90</span><span class="s2">));</span>
+
+
+    <span class="s6">//private final Pose cuvrewith1Pose = new Pose()</span>
+
+
+
+<span class="s6">//     private final Pose strafeto1Pose = new Pose(30,37, Math.toRadians(180));</span>
+
+<span class="s6">//    // private final Pose turn180Pose = new Pose(30,37, Math.toRadians(180));</span>
+<span class="s6">//     private final Pose lineto1Pose = new Pose(56,40, Math.toRadians(180));</span>
+<span class="s6">//     //private final Pose moveto1Pose = new Pose(59, 36, Math.toRadians(0)); // Lining up for sample with beziure curve idk how to spell</span>
+<span class="s6">//     private final Pose linewithsamp1Pose = new Pose(62,28, Math.toRadians(180)); // Strafing to line up with sample again b4 pushing to human player zone</span>
+<span class="s6">//     private final Pose pushsample1Pose = new Pose(20,28, Math.toRadians(180)); // Pushes 1st sample to da hmn plyer zone</span>
+
+
+<span class="s6">//     private final Pose linewithsamp2Pose = new Pose(59,24, Math.toRadians(180)); // Robot goes to 2nd sample using bezuier curve or smth</span>
+<span class="s6">//     private final Pose linewithsamp2ControlPose = new Pose(55,43, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES CAUSE DONT HAVE FIELD RN****/</span>
+
+<span class="s6">//     private final Pose pushsample2Pose = new Pose(20,24, Math.toRadians(180));</span>
+
+
+<span class="s6">//     private final Pose linewithsamp3Pose = new Pose(64,13, Math.toRadians(180)); // bot goes to 3rd sample using bezuer curve</span>
+<span class="s6">//     private final Pose linewithsamp3ControlPose = new Pose(49,40, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES **/</span>
+<span class="s6">//     private final Pose pushsample3Pose = new Pose(20,13, Math.toRadians(180)); // pushin in the final samp</span>
+
+<span class="s6">//     private final Pose pickupspecPose = new Pose(20,13, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times</span>
+
+
+
+
+
+    <span class="s6">//private final Pose scorespecPose = new Pose(18, 129, Math.toRadians(180)); // Score sample from in claw</span>
+    <span class="s6">/*private final Pose pickup2Pose = new Pose(31, 131, Math.toRadians(0)); // Second sample pickup 
+    private final Pose pickup3Pose = new Pose(34, 135, Math.toRadians(0)); // Third sample pickup 
+ 
+    private final Pose parkPose = new Pose(60, 98, Math.toRadians(90));    // Parking position 
+    private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90)); // Control point for curved path */</span>
+
+    <span class="s6">// private Path scorePre, park;</span>
+
+    <span class="s1">private </span><span class="s0">PathChain scoreFirstSamp</span><span class="s2">, </span><span class="s0">pickSecondSamp</span><span class="s2">, </span><span class="s0">scoreSecondSamp</span><span class="s2">, </span><span class="s0">pickThirdSamp</span><span class="s2">, </span><span class="s0">scoreThirdSamp</span><span class="s2">, </span><span class="s0">pickFourthSamp</span><span class="s2">, </span><span class="s0">scoreFourthSamp</span><span class="s2">, </span><span class="s0">parkFinish</span><span class="s2">;</span>
+
+    <span class="s1">private </span><span class="s0">LinearOpMode OpMode</span><span class="s2">;</span>
+    <span class="s1">public </span><span class="s0">DcMotor armMotor1</span><span class="s2">, </span><span class="s0">armMotor2</span><span class="s2">, </span><span class="s0">elbow</span><span class="s2">;</span>
+    <span class="s6">// public  RunAction toZero, toChamber;</span>
+    <span class="s1">public </span><span class="s0">PIDController PickmeupPID</span><span class="s2">, </span><span class="s0">elbowPID</span><span class="s2">;</span>
+    <span class="s1">public </span><span class="s0">Boolean armDone</span><span class="s2">;</span>
+    <span class="s1">public int </span><span class="s0">pos</span><span class="s2">;</span>
+    <span class="s1">public static double </span><span class="s0">p </span><span class="s2">= </span><span class="s4">0.01</span><span class="s2">, </span><span class="s0">i </span><span class="s2">= </span><span class="s4">0</span><span class="s2">, </span><span class="s0">d </span><span class="s2">= </span><span class="s4">0.0001</span><span class="s2">;</span>
+    <span class="s1">public static double </span><span class="s0">f </span><span class="s2">= </span><span class="s4">0</span><span class="s2">;</span>
+
+    <span class="s1">public </span><span class="s0">PIDController LlinPID</span><span class="s2">, </span><span class="s0">rotatPID</span><span class="s2">, </span><span class="s0">pickmeupPID</span><span class="s2">, </span><span class="s0">RlinPID</span><span class="s2">;</span>
+    <span class="s1">public static double </span><span class="s0">LlinTarget</span><span class="s2">;</span>
+    <span class="s1">public static double </span><span class="s0">RlinTarget</span><span class="s2">;</span>
+    <span class="s1">public static double </span><span class="s0">rotatTarget</span><span class="s2">;</span>
+    <span class="s1">public static double </span><span class="s0">pickmeupTarget</span><span class="s2">;</span>
+
+    <span class="s1">public void </span><span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s1">double </span><span class="s0">b</span><span class="s2">) {</span>
+        <span class="s0">LlinTarget </span><span class="s2">= </span><span class="s0">b</span><span class="s2">;</span>
+    <span class="s2">}</span>
+    <span class="s1">public void </span><span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s1">double </span><span class="s0">b</span><span class="s2">) {</span>
+        <span class="s0">RlinTarget </span><span class="s2">= </span><span class="s0">b</span><span class="s2">;</span>
+    <span class="s2">}</span>
+    <span class="s1">public void </span><span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s1">double </span><span class="s0">b</span><span class="s2">) {</span>
+        <span class="s0">rotatTarget </span><span class="s2">= </span><span class="s0">b</span><span class="s2">;</span>
+    <span class="s2">}</span>
+    <span class="s1">public void </span><span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s1">double </span><span class="s0">b</span><span class="s2">) {</span>
+        <span class="s0">pickmeupTarget </span><span class="s2">= </span><span class="s0">b</span><span class="s2">;</span>
+    <span class="s2">}</span>
+    <span class="s1">public int </span><span class="s0">getPos</span><span class="s2">() {</span>
+        <span class="s0">pos </span><span class="s2">= </span><span class="s0">rotat</span><span class="s2">.</span><span class="s0">getCurrentPosition</span><span class="s2">();</span>
+        <span class="s1">return </span><span class="s0">rotat</span><span class="s2">.</span><span class="s0">getCurrentPosition</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+
+    <span class="s1">public void </span><span class="s0">buildPaths</span><span class="s2">() {</span>
+        <span class="s6">// Path for scoring preload</span>
+        <span class="s0">scoreFirstSamp </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierLine</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">startPose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">startPose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">setZeroPowerAccelerationMultiplier</span><span class="s2">(</span><span class="s4">4</span><span class="s2">)</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+
+        <span class="s6">// Path chains for picking up and scoring samples</span>
+        <span class="s0">pickSecondSamp </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierLine</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">lineSamp2Pose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">lineSamp2Pose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+
+        <span class="s0">scoreSecondSamp </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierLine</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">lineSamp2Pose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">lineSamp2Pose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+
+        <span class="s0">pickThirdSamp </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierLine</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">lineSamp3Pose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">lineSamp3Pose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+
+        <span class="s0">scoreThirdSamp </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierLine</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">lineSamp3Pose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">lineSamp3Pose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+
+        <span class="s0">pickFourthSamp </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierLine</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">lineSamp4Pose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">lineSamp4Pose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+
+        <span class="s0">scoreFourthSamp </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierLine</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">lineSamp4Pose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">lineSamp4Pose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+
+        <span class="s0">parkFinish </span><span class="s2">= </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">pathBuilder</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s0">addPath</span><span class="s2">(</span><span class="s1">new </span><span class="s0">BezierCurve</span><span class="s2">(</span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">finishControlPose</span><span class="s2">), </span><span class="s1">new </span><span class="s0">Point</span><span class="s2">(</span><span class="s0">finishPose</span><span class="s2">)))</span>
+                <span class="s2">.</span><span class="s0">setLinearHeadingInterpolation</span><span class="s2">(</span><span class="s0">scorePose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">(), </span><span class="s0">finishPose</span><span class="s2">.</span><span class="s0">getHeading</span><span class="s2">())</span>
+                <span class="s2">.</span><span class="s0">build</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s1">public void </span><span class="s0">autonomousPathUpdate</span><span class="s2">() {</span>
+        <span class="s1">switch </span><span class="s2">(</span><span class="s0">pathState</span><span class="s2">) {</span>
+            <span class="s1">case </span><span class="s4">0</span><span class="s2">: </span><span class="s6">// Move from start to scoring position</span>
+                <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">scoreFirstSamp</span><span class="s2">);</span>
+                <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">0.6</span><span class="s2">);</span>
+
+                <span class="s0">imaTouchU</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.13</span><span class="s2">);</span>
+                <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">2080</span><span class="s2">);</span>
+                <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.568</span><span class="s2">);</span>
+
+                <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">1</span><span class="s2">);</span>
+                <span class="s1">break</span><span class="s2">;</span>
+
+            <span class="s1">case </span><span class="s4">1</span><span class="s2">:</span>
+                <span class="s0">ElapsedTime timer </span><span class="s2">= </span><span class="s1">new </span><span class="s0">ElapsedTime</span><span class="s2">();</span>
+                <span class="s1">double </span><span class="s0">dur </span><span class="s2">= </span><span class="s4">1200</span><span class="s2">;</span>
+                <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">960</span><span class="s2">);</span>
+
+                <span class="s1">if </span><span class="s2">(</span><span class="s0">timer</span><span class="s2">.</span><span class="s0">milliseconds</span><span class="s2">() &gt;= </span><span class="s0">dur</span><span class="s2">){</span>
+                    <span class="s0">imaTouchU</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.56</span><span class="s2">);</span>
+                    <span class="s0">dur </span><span class="s2">= </span><span class="s4">600</span><span class="s2">;</span>
+                    <span class="s0">timer</span><span class="s2">.</span><span class="s0">reset</span><span class="s2">();</span>
+                <span class="s2">}</span>
+                <span class="s1">if </span><span class="s2">(</span><span class="s0">timer</span><span class="s2">.</span><span class="s0">milliseconds</span><span class="s2">() &gt;= </span><span class="s0">dur</span><span class="s2">){</span>
+                    <span class="s0">dur </span><span class="s2">= </span><span class="s4">1200</span><span class="s2">;</span>
+                    <span class="s0">timer</span><span class="s2">.</span><span class="s0">reset</span><span class="s2">();</span>
+                <span class="s2">}</span>
+                <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">80</span><span class="s2">);</span>
+                <span class="s1">if </span><span class="s2">(</span><span class="s0">timer</span><span class="s2">.</span><span class="s0">milliseconds</span><span class="s2">() &gt;= </span><span class="s0">dur</span><span class="s2">){</span>
+                <span class="s2">}</span>
+
+            <span class="s1">case </span><span class="s4">2</span><span class="s2">: </span><span class="s6">// Wait until the robot is near the scoring position</span>
+                <span class="s1">if </span><span class="s2">(!</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">pickSecondSamp</span><span class="s2">);</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">0.8</span><span class="s2">);</span>
+
+                    <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">80</span><span class="s2">);</span>
+                    <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">80</span><span class="s2">);</span>
+                    <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">100</span><span class="s2">);</span>
+                    <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">960</span><span class="s2">);</span>
+                    <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.567</span><span class="s2">);</span>
+
+                    <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">2</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+            <span class="s1">case </span><span class="s4">3</span><span class="s2">: </span><span class="s6">// bot strafes to right of sub zone</span>
+                <span class="s1">if </span><span class="s2">(!</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">scoreSecondSamp</span><span class="s2">);</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">0.6</span><span class="s2">);</span>
+
+                    <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                    <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                    <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">2080</span><span class="s2">);</span>
+                    <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">960</span><span class="s2">);</span>
+                    <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.568</span><span class="s2">);</span>
+
+                    <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">3</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+            <span class="s1">case </span><span class="s4">4</span><span class="s2">: </span><span class="s6">// bot</span>
+                <span class="s1">if </span><span class="s2">(!</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">pickThirdSamp</span><span class="s2">);</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">1</span><span class="s2">);</span>
+
+                    <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">80</span><span class="s2">);</span>
+                    <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">80</span><span class="s2">);</span>
+                    <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">100</span><span class="s2">);</span>
+                    <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">960</span><span class="s2">);</span>
+                    <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.567</span><span class="s2">);</span>
+
+                    <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">4</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+            <span class="s1">case </span><span class="s4">5</span><span class="s2">: </span><span class="s6">// bot should move to first samp ready to push</span>
+                <span class="s1">if </span><span class="s2">(!</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">scoreThirdSamp</span><span class="s2">);</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">1</span><span class="s2">);</span>
+
+                    <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                    <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                    <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">2080</span><span class="s2">);</span>
+                    <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">960</span><span class="s2">);</span>
+                    <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.568</span><span class="s2">);</span>
+
+                    <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">5</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+            <span class="s1">case </span><span class="s4">6</span><span class="s2">: </span><span class="s6">//bot lines up w sample</span>
+                <span class="s1">if </span><span class="s2">(</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">pickFourthSamp</span><span class="s2">);</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">1</span><span class="s2">);</span>
+
+                    <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">80</span><span class="s2">);</span>
+                    <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">80</span><span class="s2">);</span>
+                    <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">100</span><span class="s2">);</span>
+                    <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">960</span><span class="s2">);</span>
+                    <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.567</span><span class="s2">);</span>
+
+                    <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">6</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+            <span class="s1">case </span><span class="s4">7</span><span class="s2">: </span><span class="s6">//bot pushes 1st sample YIPPE</span>
+                <span class="s1">if </span><span class="s2">(</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">scoreFourthSamp</span><span class="s2">);</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">1</span><span class="s2">);</span>
+
+                    <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                    <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">3200</span><span class="s2">);</span>
+                    <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">2080</span><span class="s2">);</span>
+                    <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">960</span><span class="s2">);</span>
+                    <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.568</span><span class="s2">);</span>
+
+                    <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">7</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+            <span class="s1">case </span><span class="s4">8</span><span class="s2">: </span><span class="s6">// bot lines up with 2nd samp</span>
+                <span class="s1">if </span><span class="s2">(</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">followPath</span><span class="s2">(</span><span class="s0">parkFinish</span><span class="s2">);</span>
+                    <span class="s0">follower</span><span class="s2">.</span><span class="s0">setMaxPower</span><span class="s2">(</span><span class="s4">1</span><span class="s2">);</span>
+
+                    <span class="s0">setLlinTarget</span><span class="s2">(</span><span class="s4">800</span><span class="s2">);</span>
+                    <span class="s0">setRlinTarget</span><span class="s2">(</span><span class="s4">800</span><span class="s2">);</span>
+                    <span class="s0">setRotatTarget</span><span class="s2">(</span><span class="s4">100</span><span class="s2">);</span>
+                    <span class="s0">setpickmeupTarget</span><span class="s2">(</span><span class="s4">30</span><span class="s2">);</span>
+                    <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">0.567</span><span class="s2">);</span>
+
+                    <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">8</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+            <span class="s1">case </span><span class="s4">10</span><span class="s2">: </span><span class="s6">// Wait until the robot is near the parking position</span>
+                <span class="s1">if </span><span class="s2">(!</span><span class="s0">follower</span><span class="s2">.</span><span class="s0">isBusy</span><span class="s2">()) {</span>
+                    <span class="s0">setPathState</span><span class="s2">(-</span><span class="s4">1</span><span class="s2">); </span><span class="s6">// End the autonomous routine</span>
+                <span class="s2">}</span>
+                <span class="s1">break</span><span class="s2">;</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+
+    <span class="s5">/** These change the states of the paths and actions</span>
+     <span class="s5">* It will also reset the timers of the individual switches **/</span>
+    <span class="s1">public void </span><span class="s0">setPathState</span><span class="s2">(</span><span class="s1">int </span><span class="s0">pState</span><span class="s2">) {</span>
+        <span class="s0">pathState </span><span class="s2">= </span><span class="s0">pState</span><span class="s2">;</span>
+        <span class="s0">pathTimer</span><span class="s2">.</span><span class="s0">resetTimer</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s1">public void </span><span class="s0">clampClaw</span><span class="s2">() {</span>
+        <span class="s0">imaTouchU</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">.16</span><span class="s2">);</span>
+        <span class="s0">imaTouchU</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">.58</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s1">public void </span><span class="s0">moveClaw</span><span class="s2">() {</span>
+        <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">.658</span><span class="s2">);</span>
+        <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">.567</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+
+    <span class="s5">/** This method is called continuously after Init while waiting for &quot;play&quot;. **/</span>
+    <span class="s0">@Override</span>
+    <span class="s1">public void </span><span class="s0">init</span><span class="s2">() {</span>
+        <span class="s6">//call servos here do later tho after ask ty</span>
+        <span class="s0">pickMeUp </span><span class="s2">= </span><span class="s0">hardwareMap</span><span class="s2">.</span><span class="s0">get</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s1">class</span><span class="s2">, </span><span class="s3">&quot;pickmeup&quot;</span><span class="s2">);</span>
+        <span class="s0">Llin </span><span class="s2">= </span><span class="s0">hardwareMap</span><span class="s2">.</span><span class="s0">get</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s1">class</span><span class="s2">, </span><span class="s3">&quot;Llin&quot;</span><span class="s2">);</span>
+        <span class="s0">Rlin </span><span class="s2">= </span><span class="s0">hardwareMap</span><span class="s2">.</span><span class="s0">get</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s1">class</span><span class="s2">, </span><span class="s3">&quot;Rlin&quot;</span><span class="s2">);</span>
+        <span class="s0">rotat </span><span class="s2">= </span><span class="s0">hardwareMap</span><span class="s2">.</span><span class="s0">get</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s1">class</span><span class="s2">, </span><span class="s3">&quot;rotat&quot;</span><span class="s2">);</span>
+
+        <span class="s0">imaTouchU </span><span class="s2">= </span><span class="s0">hardwareMap</span><span class="s2">.</span><span class="s0">get</span><span class="s2">(</span><span class="s0">Servo</span><span class="s2">.</span><span class="s1">class</span><span class="s2">, </span><span class="s3">&quot;imaTouchU&quot;</span><span class="s2">);</span>
+        <span class="s0">ankel </span><span class="s2">= </span><span class="s0">hardwareMap</span><span class="s2">.</span><span class="s0">get</span><span class="s2">(</span><span class="s0">Servo</span><span class="s2">.</span><span class="s1">class</span><span class="s2">, </span><span class="s3">&quot;ankel&quot;</span><span class="s2">);</span>
+
+        <span class="s6">// setting timers</span>
+        <span class="s0">pathTimer </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Timer</span><span class="s2">();</span>
+        <span class="s0">opmodeTimer </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Timer</span><span class="s2">();</span>
+        <span class="s0">opmodeTimer</span><span class="s2">.</span><span class="s0">resetTimer</span><span class="s2">();</span>
+
+        <span class="s6">// setting motor pid values</span>
+        <span class="s0">LlinPID </span><span class="s2">= </span><span class="s1">new </span><span class="s0">PIDController</span><span class="s2">(</span><span class="s0">p</span><span class="s2">,</span><span class="s0">i</span><span class="s2">,</span><span class="s0">d</span><span class="s2">);</span>
+        <span class="s0">RlinPID </span><span class="s2">= </span><span class="s1">new </span><span class="s0">PIDController</span><span class="s2">(</span><span class="s0">p</span><span class="s2">,</span><span class="s0">i</span><span class="s2">,</span><span class="s0">d</span><span class="s2">);</span>
+        <span class="s0">rotatPID </span><span class="s2">= </span><span class="s1">new </span><span class="s0">PIDController</span><span class="s2">(</span><span class="s0">p</span><span class="s2">, </span><span class="s0">i</span><span class="s2">, </span><span class="s0">d</span><span class="s2">);</span>
+        <span class="s0">pickmeupPID </span><span class="s2">= </span><span class="s1">new </span><span class="s0">PIDController</span><span class="s2">(</span><span class="s0">p</span><span class="s2">, </span><span class="s0">i</span><span class="s2">, </span><span class="s0">d</span><span class="s2">);</span>
+
+        <span class="s0">pickMeUp</span><span class="s2">.</span><span class="s0">setDirection</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s0">Direction</span><span class="s2">.</span><span class="s0">REVERSE</span><span class="s2">);</span>
+        <span class="s0">Llin</span><span class="s2">.</span><span class="s0">setDirection</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s0">Direction</span><span class="s2">.</span><span class="s0">REVERSE</span><span class="s2">);</span>
+        <span class="s0">Rlin</span><span class="s2">.</span><span class="s0">setDirection</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s0">Direction</span><span class="s2">.</span><span class="s0">FORWARD</span><span class="s2">);</span>
+        <span class="s0">rotat</span><span class="s2">.</span><span class="s0">setDirection</span><span class="s2">(</span><span class="s0">DcMotor</span><span class="s2">.</span><span class="s0">Direction</span><span class="s2">.</span><span class="s0">FORWARD</span><span class="s2">);</span>
+
+        <span class="s0">clampClaw</span><span class="s2">();</span>
+        <span class="s0">moveClaw</span><span class="s2">();</span>
+        <span class="s0">ankel</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">.6</span><span class="s2">); </span><span class="s6">// was .658</span>
+        <span class="s0">imaTouchU</span><span class="s2">.</span><span class="s0">setPosition</span><span class="s2">(</span><span class="s4">.16</span><span class="s2">);</span>
+
+
+
+        <span class="s0">Constants</span><span class="s2">.</span><span class="s0">setConstants</span><span class="s2">(</span><span class="s0">FConstants</span><span class="s2">.</span><span class="s1">class</span><span class="s2">, </span><span class="s0">LConstants</span><span class="s2">.</span><span class="s1">class</span><span class="s2">);</span>
+        <span class="s0">follower </span><span class="s2">= </span><span class="s1">new </span><span class="s0">Follower</span><span class="s2">(</span><span class="s0">hardwareMap</span><span class="s2">);</span>
+        <span class="s0">follower</span><span class="s2">.</span><span class="s0">setStartingPose</span><span class="s2">(</span><span class="s0">startPose</span><span class="s2">);</span>
+        <span class="s0">buildPaths</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">@Override</span>
+    <span class="s1">public void </span><span class="s0">loop</span><span class="s2">() {</span>
+        <span class="s6">//these loop the movements of the wobot</span>
+        <span class="s0">follower</span><span class="s2">.</span><span class="s0">update</span><span class="s2">();</span>
+        <span class="s0">autonomousPathUpdate</span><span class="s2">();</span>
+        <span class="s0">LlinPID</span><span class="s2">.</span><span class="s0">setPID</span><span class="s2">(</span><span class="s0">p</span><span class="s2">,</span><span class="s0">i</span><span class="s2">,</span><span class="s0">d</span><span class="s2">);</span>
+        <span class="s0">RlinPID</span><span class="s2">.</span><span class="s0">setPID</span><span class="s2">(</span><span class="s0">p</span><span class="s2">,</span><span class="s0">i</span><span class="s2">,</span><span class="s0">d</span><span class="s2">);</span>
+        <span class="s0">rotatPID</span><span class="s2">.</span><span class="s0">setPID</span><span class="s2">(</span><span class="s0">p</span><span class="s2">,</span><span class="s0">i</span><span class="s2">,</span><span class="s0">d</span><span class="s2">);</span>
+        <span class="s0">pickmeupPID</span><span class="s2">.</span><span class="s0">setPID</span><span class="s2">(</span><span class="s0">p</span><span class="s2">,</span><span class="s0">i</span><span class="s2">,</span><span class="s0">d</span><span class="s2">);</span>
+
+        <span class="s1">int </span><span class="s0">LlinPos </span><span class="s2">= </span><span class="s0">Llin</span><span class="s2">.</span><span class="s0">getCurrentPosition</span><span class="s2">();</span>
+        <span class="s1">int </span><span class="s0">RlinPos </span><span class="s2">= </span><span class="s0">Rlin</span><span class="s2">.</span><span class="s0">getCurrentPosition</span><span class="s2">();</span>
+        <span class="s1">int </span><span class="s0">rotatPos </span><span class="s2">= </span><span class="s0">rotat</span><span class="s2">.</span><span class="s0">getCurrentPosition</span><span class="s2">();</span>
+        <span class="s1">int </span><span class="s0">pickmeupPos </span><span class="s2">= </span><span class="s0">pickMeUp</span><span class="s2">.</span><span class="s0">getCurrentPosition</span><span class="s2">();</span>
+
+        <span class="s1">double </span><span class="s0">Llpid </span><span class="s2">= </span><span class="s0">LlinPID</span><span class="s2">.</span><span class="s0">calculate</span><span class="s2">(</span><span class="s0">LlinPos</span><span class="s2">, </span><span class="s0">LlinTarget</span><span class="s2">);</span>
+        <span class="s1">double </span><span class="s0">Rlpid </span><span class="s2">= </span><span class="s0">RlinPID</span><span class="s2">.</span><span class="s0">calculate</span><span class="s2">(</span><span class="s0">RlinPos</span><span class="s2">, </span><span class="s0">RlinTarget</span><span class="s2">);</span>
+        <span class="s1">double </span><span class="s0">rpid </span><span class="s2">= </span><span class="s0">rotatPID</span><span class="s2">.</span><span class="s0">calculate</span><span class="s2">(</span><span class="s0">rotatPos</span><span class="s2">, </span><span class="s0">rotatTarget</span><span class="s2">);</span>
+        <span class="s1">double </span><span class="s0">mpid </span><span class="s2">= </span><span class="s0">pickmeupPID</span><span class="s2">.</span><span class="s0">calculate</span><span class="s2">(</span><span class="s0">pickmeupPos</span><span class="s2">, </span><span class="s0">pickmeupTarget</span><span class="s2">);</span>
+
+        <span class="s1">double </span><span class="s0">Llff </span><span class="s2">= </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">cos</span><span class="s2">(</span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s0">LlinTarget </span><span class="s2">/ </span><span class="s0">ticks_in_degree</span><span class="s2">)) * </span><span class="s0">f</span><span class="s2">;</span>
+        <span class="s1">double </span><span class="s0">Rlff </span><span class="s2">= </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">cos</span><span class="s2">(</span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s0">RlinTarget </span><span class="s2">/ </span><span class="s0">ticks_in_degree</span><span class="s2">)) * </span><span class="s0">f</span><span class="s2">;</span>
+        <span class="s1">double </span><span class="s0">rff </span><span class="s2">= </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">cos</span><span class="s2">(</span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s0">rotatTarget </span><span class="s2">/ </span><span class="s0">ticks_in_degree</span><span class="s2">)) * </span><span class="s0">f</span><span class="s2">;</span>
+        <span class="s1">double </span><span class="s0">mff </span><span class="s2">= </span><span class="s0">Math</span><span class="s2">.</span><span class="s0">cos</span><span class="s2">(</span><span class="s0">Math</span><span class="s2">.</span><span class="s0">toRadians</span><span class="s2">(</span><span class="s0">pickmeupTarget </span><span class="s2">/ </span><span class="s0">ticks_in_degree</span><span class="s2">)) * </span><span class="s0">f</span><span class="s2">;</span>
+
+        <span class="s1">double </span><span class="s0">LlinPower </span><span class="s2">= </span><span class="s0">Llff </span><span class="s2">+ </span><span class="s0">Llpid</span><span class="s2">;</span>
+        <span class="s1">double </span><span class="s0">RlinPower </span><span class="s2">= </span><span class="s0">Rlff </span><span class="s2">+ </span><span class="s0">Rlpid</span><span class="s2">;</span>
+        <span class="s1">double </span><span class="s0">rotatPower </span><span class="s2">= </span><span class="s0">rff </span><span class="s2">+ </span><span class="s0">rpid</span><span class="s2">;</span>
+        <span class="s1">double </span><span class="s0">pickmeupPower </span><span class="s2">= </span><span class="s0">mff </span><span class="s2">+ </span><span class="s0">mpid</span><span class="s2">;</span>
+
+        <span class="s0">Llin</span><span class="s2">.</span><span class="s0">setPower</span><span class="s2">(</span><span class="s0">LlinPower</span><span class="s2">);</span>
+        <span class="s0">Rlin</span><span class="s2">.</span><span class="s0">setPower</span><span class="s2">(</span><span class="s0">LlinPower</span><span class="s2">);</span>
+        <span class="s0">rotat</span><span class="s2">.</span><span class="s0">setPower</span><span class="s2">(</span><span class="s0">rotatPower</span><span class="s2">);</span>
+        <span class="s0">pickMeUp</span><span class="s2">.</span><span class="s0">setPower</span><span class="s2">(</span><span class="s0">pickmeupPower</span><span class="s2">);</span>
+
+        <span class="s6">// Feedback to Driver Hub</span>
+        <span class="s0">telemetry</span><span class="s2">.</span><span class="s0">addData</span><span class="s2">(</span><span class="s3">&quot;path state&quot;</span><span class="s2">, </span><span class="s0">pathState</span><span class="s2">);</span>
+        <span class="s0">telemetry</span><span class="s2">.</span><span class="s0">addData</span><span class="s2">(</span><span class="s3">&quot;x&quot;</span><span class="s2">, </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">getPose</span><span class="s2">().</span><span class="s0">getX</span><span class="s2">());</span>
+        <span class="s0">telemetry</span><span class="s2">.</span><span class="s0">addData</span><span class="s2">(</span><span class="s3">&quot;y&quot;</span><span class="s2">, </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">getPose</span><span class="s2">().</span><span class="s0">getY</span><span class="s2">());</span>
+        <span class="s0">telemetry</span><span class="s2">.</span><span class="s0">addData</span><span class="s2">(</span><span class="s3">&quot;heading&quot;</span><span class="s2">, </span><span class="s0">follower</span><span class="s2">.</span><span class="s0">getTotalHeading</span><span class="s2">());</span>
+        <span class="s0">telemetry</span><span class="s2">.</span><span class="s0">update</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s5">/** This method is called once at the start of the OpMode.</span>
+     <span class="s5">* It runs all the setup actions, including building paths and starting the path system **/</span>
+    <span class="s0">@Override</span>
+    <span class="s1">public void </span><span class="s0">start</span><span class="s2">() {</span>
+        <span class="s0">opmodeTimer</span><span class="s2">.</span><span class="s0">resetTimer</span><span class="s2">();</span>
+        <span class="s0">setPathState</span><span class="s2">(</span><span class="s4">0</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s5">/** We do not use this because everything should automatically disable **/</span>
+    <span class="s0">@Override</span>
+    <span class="s1">public void </span><span class="s0">stop</span><span class="s2">() {</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
