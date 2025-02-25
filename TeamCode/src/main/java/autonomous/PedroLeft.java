@@ -1,3 +1,4 @@
+
 package autonomous;
 
 import com.pedropathing.follower.Follower;
@@ -178,67 +179,129 @@ public class PedroLeft extends OpMode {
         switch (pathState) {
             case 0: // Move from start to scoring position
                 follower.followPath(scoreFirstSamp);
-                follower.setMaxPower(1);
+                follower.setMaxPower(0.6);
+
+                imaTouchU.setPosition(0.13);
+                setLlinTarget(3200);
+                setRlinTarget(3200);
+                setRotatTarget(2080);
+                ankel.setPosition(0.568);
+
                 setPathState(1);
                 break;
 
-            case 1: // Wait until the robot is near the scoring position
+            case 1:
+                ElapsedTime timer = new ElapsedTime();
+                double dur = 1200;
+                setpickmeupTarget(960);
+
+                if (timer.milliseconds() >= dur){
+                    imaTouchU.setPosition(0.56);
+                    dur = 600;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur){
+                    dur = 1200;
+                    timer.reset();
+                }
+                setpickmeupTarget(80);
+                if (timer.milliseconds() >= dur){
+                }
+
+            case 2: // Wait until the robot is near the scoring position
                 if (!follower.isBusy()) {
                     follower.followPath(pickSecondSamp);
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.8);
 
-                    imaTouchU.setPosition(.58);
-                    ankel.setPosition(.658);
-                    setRotatTarget(300);
-                    setpickmeupTarget(10);
+                    setLlinTarget(80);
+                    setRlinTarget(80);
+                    setRotatTarget(100);
+                    setpickmeupTarget(960);
+                    ankel.setPosition(0.567);
 
                     setPathState(2);
                 }
                 break;
-            case 2: // bot strafes to right of sub zone
+            case 3: // bot strafes to right of sub zone
                 if (!follower.isBusy()) {
                     follower.followPath(scoreSecondSamp);
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.6);
+
+                    setLlinTarget(3200);
+                    setRlinTarget(3200);
+                    setRotatTarget(2080);
+                    setpickmeupTarget(960);
+                    ankel.setPosition(0.568);
 
                     setPathState(3);
                 }
                 break;
-            case 3: // bot
+            case 4: // bot
                 if (!follower.isBusy()) {
                     follower.followPath(pickThirdSamp);
                     follower.setMaxPower(1);
 
+                    setLlinTarget(80);
+                    setRlinTarget(80);
+                    setRotatTarget(100);
+                    setpickmeupTarget(960);
+                    ankel.setPosition(0.567);
+
                     setPathState(4);
                 }
                 break;
-            case 4: // bot should move to first samp ready to push
+            case 5: // bot should move to first samp ready to push
                 if (!follower.isBusy()) {
                     follower.followPath(scoreThirdSamp);
                     follower.setMaxPower(1);
 
+                    setLlinTarget(3200);
+                    setRlinTarget(3200);
+                    setRotatTarget(2080);
+                    setpickmeupTarget(960);
+                    ankel.setPosition(0.568);
+
                     setPathState(5);
                 }
                 break;
-            case 5: //bot lines up w sample
+            case 6: //bot lines up w sample
                 if (follower.isBusy()) {
                     follower.followPath(pickFourthSamp);
                     follower.setMaxPower(1);
 
+                    setLlinTarget(80);
+                    setRlinTarget(80);
+                    setRotatTarget(100);
+                    setpickmeupTarget(960);
+                    ankel.setPosition(0.567);
+
                     setPathState(6);
                 }
                 break;
-            case 6: //bot pushes 1st sample YIPPE
+            case 7: //bot pushes 1st sample YIPPE
                 if (follower.isBusy()) {
                     follower.followPath(scoreFourthSamp);
                     follower.setMaxPower(1);
 
+                    setLlinTarget(3200);
+                    setRlinTarget(3200);
+                    setRotatTarget(2080);
+                    setpickmeupTarget(960);
+                    ankel.setPosition(0.568);
+
                     setPathState(7);
                 }
                 break;
-            case 7: // bot lines up with 2nd samp
+            case 8: // bot lines up with 2nd samp
                 if (follower.isBusy()) {
                     follower.followPath(parkFinish);
                     follower.setMaxPower(1);
+
+                    setLlinTarget(800);
+                    setRlinTarget(800);
+                    setRotatTarget(100);
+                    setpickmeupTarget(30);
+                    ankel.setPosition(0.567);
 
                     setPathState(8);
                 }

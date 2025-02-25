@@ -47,7 +47,7 @@ public class PedroRight extends OpMode {
     private int pathState;
 
     private final Pose startPose = new Pose(8.5, 70, Math.toRadians(0));  // Starting position
-    private final Pose scoreprePose = new Pose(38, 70, Math.toRadians(0)); // Scoring position
+    private final Pose scoreprePose = new Pose(40, 70, Math.toRadians(0)); // Scoring position
     private final Pose linewith1Pose = new Pose(30,70, Math.toRadians(90)); // move robot back a bit after score pre
 
     //private final Pose cuvrewith1Pose = new Pose()
@@ -59,21 +59,38 @@ public class PedroRight extends OpMode {
    // private final Pose turn180Pose = new Pose(30,37, Math.toRadians(180));
     private final Pose lineto1Pose = new Pose(56,40, Math.toRadians(180));
     //private final Pose moveto1Pose = new Pose(59, 36, Math.toRadians(0)); // Lining up for sample with beziure curve idk how to spell
-    private final Pose linewithsamp1Pose = new Pose(62,28, Math.toRadians(180)); // Strafing to line up with sample again b4 pushing to human player zone
-    private final Pose pushsample1Pose = new Pose(20,28, Math.toRadians(180)); // Pushes 1st sample to da hmn plyer zone
+    private final Pose linewithsamp1Pose = new Pose(58,28, Math.toRadians(180)); // Strafing to line up with sample again b4 pushing to human player zone
+    private final Pose pushsample1Pose = new Pose(23,28, Math.toRadians(180)); // Pushes 1st sample to da hmn plyer zone
 
 
-    private final Pose linewithsamp2Pose = new Pose(59,24, Math.toRadians(180)); // Robot goes to 2nd sample using bezuier curve or smth
+    private final Pose linewithsamp2Pose = new Pose(58,20, Math.toRadians(180)); // Robot goes to 2nd sample using bezuier curve or smth
     private final Pose linewithsamp2ControlPose = new Pose(55,43, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES CAUSE DONT HAVE FIELD RN****/
 
-    private final Pose pushsample2Pose = new Pose(20,24, Math.toRadians(180));
+    private final Pose pushsample2Pose = new Pose(23,20, Math.toRadians(180));
 
 
-    private final Pose linewithsamp3Pose = new Pose(64,13, Math.toRadians(180)); // bot goes to 3rd sample using bezuer curve
+    private final Pose linewithsamp3Pose = new Pose(58,15, Math.toRadians(180)); // bot goes to 3rd sample using bezuer curve
     private final Pose linewithsamp3ControlPose = new Pose(49,40, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES **/
-    private final Pose pushsample3Pose = new Pose(20,13, Math.toRadians(180)); // pushin in the final samp
 
-    private final Pose pickupspecPose = new Pose(20,13, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
+    private final Pose pushsample3Pose = new Pose(23,15, Math.toRadians(180)); // pushin in the final samp
+
+    private final Pose pickupspec2Pose = new Pose(26,15, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
+
+    private final Pose pickupspecsPose = new Pose(13,23, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
+
+    private final Pose control2 = new Pose(10,64);
+    private final Pose control3 = new Pose(15,72);
+    private final Pose linescore2 = new Pose(30,68, Math.toRadians(0));
+    private final Pose scorespec2 = new Pose(38,68, Math.toRadians(355));
+
+
+    private final Pose scorespec3 = new Pose(38,66, Math.toRadians(0));
+
+
+    private final Pose scorespec4 = new Pose(38,64, Math.toRadians(0));
+
+
+    private final Pose scorespec5 = new Pose(38,62, Math.toRadians(0));
 
 
 
@@ -88,7 +105,7 @@ public class PedroRight extends OpMode {
 
    // private Path scorePre, park;
 
-    private PathChain scorePre, movetofirst, pushinsamps, pickspecup, scorespec;
+    private PathChain scorePre, movetofirst, pushinsamps, pickspecup, line2score;
 
     private LinearOpMode OpMode;
     public DcMotor armMotor1, armMotor2, elbow;
@@ -97,7 +114,7 @@ public class PedroRight extends OpMode {
     public Boolean armDone;
     public int pos;
     public static double p = 0.01, i = 0, d = 0.0001;
-    public static double f = 0;
+    public static double f = 0.01;
 
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
     public static double LlinTarget;
@@ -157,18 +174,34 @@ public class PedroRight extends OpMode {
                  .build();
 
         pickspecup = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pushsample3Pose), new Point(pickupspecPose)))
-                .setLinearHeadingInterpolation(pushsample3Pose.getHeading(), pickupspecPose.getHeading())
+                .addPath(new BezierLine(new Point(pushsample3Pose), new Point(pickupspec2Pose)))
+                .setLinearHeadingInterpolation(pushsample3Pose.getHeading(), pickupspec2Pose.getHeading())
                 .build();
 
+        line2score = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(pickupspec2Pose), new Point(linescore2)))
+                .setLinearHeadingInterpolation(pickupspec2Pose.getHeading(), linescore2.getHeading())
+                .build();
+
+        /*score2spec = follower.pathBuilder()
+                /*.addPath(new BezierCurve(new Point(control2), new Point(control3), new Point(scorespec2)))
+                .setLinearHeadingInterpolation(pickupspec2Pose.getHeading(), control3.getHeading(), scorespec2.getHeading())
+                .build(); */
+
+
+
+            //gotospec3 = follower.pathBuilder()
+               //.addPath(new BezierLine(new Point(s)))
+
     }
+
 
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Move from start to scoring position
-                follower.setMaxPower(.8);
-                setRotatTarget(1600);
-                setpickmeupTarget(450);
+                follower.setMaxPower(1);
+                setRotatTarget(1300);
+                setpickmeupTarget(600);
                 follower.followPath(scorePre);
                 setPathState(1);
                 break;
@@ -178,7 +211,6 @@ public class PedroRight extends OpMode {
                     follower.setMaxPower(1);
                     follower.followPath(movetofirst);
                     imaTouchU.setPosition(.58);
-                    ankel.setPosition(.658);
                     //setRotatTarget(10);
                     setpickmeupTarget(10);
                     setPathState(2);
@@ -187,17 +219,45 @@ public class PedroRight extends OpMode {
             case 2: // bot strafes to right of sub zone
                 if (!follower.isBusy()) {
                     follower.followPath(pushinsamps);
-                    setpickmeupTarget(200);
+                    setRotatTarget(500);
+                    ankel.setPosition(.62);
+                    imaTouchU.setPosition(.58);
                     setPathState(3);
                 }
                 break;
-            case 3: // bot
+            case 3:
                 if (!follower.isBusy()) {
                     follower.followPath(pickspecup);
-
                     setPathState(4);
                 }
-                //break;
+                break;
+            case 4: // bot
+                if (!follower.isBusy()) {
+                    ankel.setPosition(.6);
+                    imaTouchU.setPosition(.16);
+                    setPathState(5);
+                    setRotatTarget(1300);
+                    setpickmeupTarget(450);
+                    follower.followPath(line2score);
+                }
+                break;
+           /* case 5:
+                if (!follower.isBusy()) {
+                    setRotatTarget(1300);
+                    setpickmeupTarget(470);
+
+                    follower.followPath(score2spec);
+                    setPathState(6);
+                } */
+            /*case 4: // pick up 2nd spec
+                 if (!follower.isBusy()) {
+                    follower.followPath(pickspecup);
+
+
+
+                    follower.followPath(score2spec);
+                    setPathState(5);
+                }
                 /*
             case 4: // bot should move to first samp ready to push
                 if (!follower.isBusy()) {
@@ -310,7 +370,6 @@ public class PedroRight extends OpMode {
         moveClaw();
         ankel.setPosition(.658); // was .658
         imaTouchU.setPosition(.16);
-        setRotatTarget(1600);
 
 
 
