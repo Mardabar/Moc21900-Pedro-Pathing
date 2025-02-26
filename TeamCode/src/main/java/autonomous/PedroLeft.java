@@ -1,4 +1,5 @@
 
+
 package autonomous;
 
 import com.pedropathing.follower.Follower;
@@ -53,8 +54,8 @@ public class PedroLeft extends OpMode {
     private final Pose startPose = new Pose(8.20, 104.20, Math.toRadians(90));  // Starting position
     private final Pose scorePose = new Pose(15.45, 129.36, Math.toRadians(135)); // Scoring position
 
-    private final Pose lineSamp2Pose = new Pose(33.83, 118.36, Math.toRadians(0)); // move robot back a bit after score pre
-    private final Pose lineSamp3Pose = new Pose(33.83, 128.36, Math.toRadians(0));
+    private final Pose lineSamp2Pose = new Pose(31, 118.36, Math.toRadians(0)); // move robot back a bit after score pre
+    private final Pose lineSamp3Pose = new Pose(31, 128.36, Math.toRadians(0));
     private final Pose lineSamp4Pose = new Pose(38.52, 131.82, Math.toRadians(42));
 
     private final Pose finishPose = new Pose(59.36, 108.18, Math.toRadians(-90));
@@ -181,7 +182,7 @@ public class PedroLeft extends OpMode {
 
     public void autonomousPathUpdate() {
         switch (pathState) {
-            case 0: // Move from start to scoring position
+            case 0:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreFirstSamp);
                     follower.setMaxPower(0.6);
@@ -191,7 +192,7 @@ public class PedroLeft extends OpMode {
                     imaTouchU.setPosition(0.13);
                     setLlinTarget(3200);
                     setRlinTarget(3200);
-                    setRotatTarget(1600);
+                    setRotatTarget(2200);
                     ankel.setPosition(0.568);
                 }
 
@@ -200,7 +201,7 @@ public class PedroLeft extends OpMode {
                 }
 
                 if (!follower.isBusy() && timerCount == 0) {
-                    dur = 1200;
+                    dur = 900;
                     timerCount = -1;
                     setPathState(1);
                 }
@@ -215,13 +216,13 @@ public class PedroLeft extends OpMode {
 
                 if (timer.milliseconds() >= dur && timerCount == 0){
                     imaTouchU.setPosition(0.56);
-                    dur = 600;
+                    dur = 400;
                     timerCount = 1;
                     timer.reset();
                 }
                 if (timer.milliseconds() >= dur && timerCount == 1){
                     setpickmeupTarget(80);
-                    dur = 1200;
+                    dur = 900;
                     timerCount = 2;
                     timer.reset();
                 }
@@ -231,105 +232,336 @@ public class PedroLeft extends OpMode {
                 }
                 break;
 
-            case 2: // Wait until the robot is near the scoring position
-                if (!follower.isBusy()) {
+            case 2:
+                if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(pickSecondSamp);
                     follower.setMaxPower(0.8);
+                    dur = 200;
+                    timer.reset();
 
                     setLlinTarget(80);
                     setRlinTarget(80);
-                    setRotatTarget(100);
-                    setpickmeupTarget(960);
+                    setRotatTarget(300);
                     ankel.setPosition(0.567);
+                }
 
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
+
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 900;
+                    timerCount = -1;
                     setPathState(3);
                 }
                 break;
-            case 3: // bot strafes to right of sub zone
-                if (!follower.isBusy()) {
+
+            case 3:
+                if (timerCount == -1){
+                    setpickmeupTarget(960);
+                    timer.reset();
+                    timerCount = 0;
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 0){
+                    setRotatTarget(100);
+                    dur = 400;
+                    timerCount = 1;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 1){
+                    imaTouchU.setPosition(0.13);
+                    dur = 400;
+                    timerCount = 2;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 2){
+                    setRotatTarget(300);
+                    setpickmeupTarget(80);
+                    dur = 900;
+                    timerCount = 3;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 3){
+                    setPathState(4);
+                    timerCount = -1;
+                }
+                break;
+
+            case 4:
+                if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreSecondSamp);
                     follower.setMaxPower(0.6);
+                    dur = 200;
+                    timer.reset();
 
                     setLlinTarget(3200);
                     setRlinTarget(3200);
-                    setRotatTarget(2080);
-                    setpickmeupTarget(960);
+                    setRotatTarget(2200);
                     ankel.setPosition(0.568);
-
-                    setPathState(3);
                 }
-                break;
-            case 4: // bot
-                if (!follower.isBusy()) {
-                    follower.followPath(pickThirdSamp);
-                    follower.setMaxPower(1);
 
-                    setLlinTarget(80);
-                    setRlinTarget(80);
-                    setRotatTarget(100);
-                    setpickmeupTarget(960);
-                    ankel.setPosition(0.567);
-
-                    setPathState(4);
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
                 }
-                break;
-            case 5: // bot should move to first samp ready to push
-                if (!follower.isBusy()) {
-                    follower.followPath(scoreThirdSamp);
-                    follower.setMaxPower(1);
 
-                    setLlinTarget(3200);
-                    setRlinTarget(3200);
-                    setRotatTarget(2080);
-                    setpickmeupTarget(960);
-                    ankel.setPosition(0.568);
-
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 900;
+                    timerCount = -1;
                     setPathState(5);
                 }
                 break;
-            case 6: //bot lines up w sample
-                if (follower.isBusy()) {
-                    follower.followPath(pickFourthSamp);
-                    follower.setMaxPower(1);
+
+            case 5:
+                if (timerCount == -1){
+                    setpickmeupTarget(960);
+                    timer.reset();
+                    timerCount = 0;
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 0){
+                    imaTouchU.setPosition(0.56);
+                    dur = 400;
+                    timerCount = 1;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 1){
+                    setpickmeupTarget(80);
+                    dur = 900;
+                    timerCount = 2;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 2){
+                    setPathState(6);
+                    timerCount = -1;
+                }
+                break;
+
+            case 6:
+                if (!follower.isBusy() && timerCount == -1) {
+                    follower.followPath(pickThirdSamp);
+                    follower.setMaxPower(0.8);
+                    dur = 200;
+                    timer.reset();
 
                     setLlinTarget(80);
                     setRlinTarget(80);
-                    setRotatTarget(100);
-                    setpickmeupTarget(960);
+                    setRotatTarget(300);
                     ankel.setPosition(0.567);
-
-                    setPathState(6);
                 }
-                break;
-            case 7: //bot pushes 1st sample YIPPE
-                if (follower.isBusy()) {
-                    follower.followPath(scoreFourthSamp);
-                    follower.setMaxPower(1);
 
-                    setLlinTarget(3200);
-                    setRlinTarget(3200);
-                    setRotatTarget(2080);
-                    setpickmeupTarget(960);
-                    ankel.setPosition(0.568);
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
 
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 900;
+                    timerCount = -1;
                     setPathState(7);
                 }
                 break;
-            case 8: // bot lines up with 2nd samp
-                if (follower.isBusy()) {
+
+            case 7:
+                if (timerCount == -1){
+                    setpickmeupTarget(960);
+                    timer.reset();
+                    timerCount = 0;
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 0){
+                    setRotatTarget(100);
+                    dur = 400;
+                    timerCount = 1;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 1){
+                    imaTouchU.setPosition(0.13);
+                    dur = 400;
+                    timerCount = 2;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 2){
+                    setRotatTarget(300);
+                    setpickmeupTarget(80);
+                    dur = 900;
+                    timerCount = 3;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 3){
+                    setPathState(8);
+                    timerCount = -1;
+                }
+                break;
+
+            case 8: // bot should move to first samp ready to push
+                if (!follower.isBusy() && timerCount == -1) {
+                    follower.followPath(scoreThirdSamp);
+                    follower.setMaxPower(0.6);
+                    dur = 200;
+                    timer.reset();
+
+                    setLlinTarget(3200);
+                    setRlinTarget(3200);
+                    setRotatTarget(1800);
+                    ankel.setPosition(0.568);
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
+
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 900;
+                    timerCount = -1;
+                    setPathState(9);
+                }
+                break;
+
+            case 9:
+                if (timerCount == -1){
+                    setpickmeupTarget(960);
+                    timer.reset();
+                    timerCount = 0;
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 0){
+                    imaTouchU.setPosition(0.56);
+                    dur = 400;
+                    timerCount = 1;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 1){
+                    setpickmeupTarget(80);
+                    dur = 900;
+                    timerCount = 2;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 2){
+                    setPathState(10);
+                    timerCount = -1;
+                }
+                break;
+
+            case 10: //bot lines up w sample
+                if (!follower.isBusy() && timerCount == -1) {
+                    follower.followPath(pickFourthSamp);
+                    follower.setMaxPower(0.8);
+                    dur = 200;
+                    timer.reset();
+
+                    setLlinTarget(80);
+                    setRlinTarget(80);
+                    setRotatTarget(300);
+                    ankel.setPosition(0.567);
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
+
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 900;
+                    timerCount = -1;
+                    setPathState(11);
+                }
+                break;
+
+            case 11:
+                if (timerCount == -1){
+                    setpickmeupTarget(960);
+                    timer.reset();
+                    timerCount = 0;
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 0){
+                    setRotatTarget(100);
+                    dur = 400;
+                    timerCount = 1;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 1){
+                    imaTouchU.setPosition(0.13);
+                    dur = 400;
+                    timerCount = 2;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 2){
+                    setRotatTarget(300);
+                    setpickmeupTarget(80);
+                    dur = 900;
+                    timerCount = 3;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 3){
+                    setPathState(12);
+                    timerCount = -1;
+                }
+                break;
+
+            case 12:
+                if (!follower.isBusy() && timerCount == -1) {
+                    follower.followPath(scoreFourthSamp);
+                    follower.setMaxPower(0.6);
+                    dur = 200;
+                    timer.reset();
+
+                    setLlinTarget(3200);
+                    setRlinTarget(3200);
+                    setRotatTarget(1800);
+                    ankel.setPosition(0.568);
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
+
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 900;
+                    timerCount = -1;
+                    setPathState(13);
+                }
+                break;
+
+            case 13:
+                if (timerCount == -1){
+                    setpickmeupTarget(960);
+                    timer.reset();
+                    timerCount = 0;
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 0){
+                    imaTouchU.setPosition(0.56);
+                    dur = 400;
+                    timerCount = 1;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 1){
+                    setpickmeupTarget(80);
+                    dur = 900;
+                    timerCount = 2;
+                    timer.reset();
+                }
+                if (timer.milliseconds() >= dur && timerCount == 2){
+                    setPathState(14);
+                    timerCount = -1;
+                }
+                break;
+
+            case 14:
+                if (!follower.isBusy()) {
                     follower.followPath(parkFinish);
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.8);
 
                     setLlinTarget(800);
                     setRlinTarget(800);
                     setRotatTarget(100);
-                    setpickmeupTarget(30);
                     ankel.setPosition(0.567);
 
-                    setPathState(8);
+                    setPathState(15);
                 }
                 break;
-            case 10: // Wait until the robot is near the parking position
+
+            case 15: // Wait until the robot is near the parking position
                 if (!follower.isBusy()) {
                     setPathState(-1); // End the autonomous routine
                 }
