@@ -266,6 +266,7 @@ public class PedroRight extends OpMode {
                     follower.followPath(pickspecup);
                     setPathState(5);
                 }
+                break;
             case 5:  // Move from start to scoring position
                 if (!follower.isBusy()) {
                     follower.followPath(score2spec);
