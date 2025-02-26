@@ -32,9 +32,11 @@ public class PedroRight extends OpMode {
     Servo ankel;
     Servo imaTouchU;
 
-    private ElapsedTime movementTimer = new ElapsedTime();
-    private final double ticks_in_degree = 537.7; // ticks in degree for 312 motors
-    private final double rotat_ticks_in_degree = 3895.9; // ticks in degree for the 43 rpm motor
+    private ElapsedTime timer = new ElapsedTime();
+    double dur = 1200;
+    int timerCount = -1;
+    public final double ticks_in_degree = 537.7; // ticks in degree for 312 motors
+    public final double rotat_ticks_in_degree = 3895.9; // ticks in degree for the 43 rpm motor
     static final double COUNTS_PER_MOTOR_REV = 280;
     static final double DRIVE_GEAR_REDUCTION = 2.95;
     static final double WHEEL_DIAMETER_INCHES = 4.0;
@@ -201,24 +203,40 @@ public class PedroRight extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Move from start to scoring position
-                follower.setMaxPower(.8);
-                setRotatTarget(1500);
-                //setRotatTarget(1400);
-                //setpickmeupTarget(500);
-                follower.followPath(scorePre);
-                setPathState(1);
+                if (!follower.isBusy() && timerCount == -1) {
+                    follower.followPath(scorePre);
+                    follower.setMaxPower(.8);
+                    dur = 200;
+                    timer.reset();
+
+                    setRotatTarget(1500);
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
+
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 600;
+                    timerCount = -1;
+                    setPathState(1);
+                }
                 break;
-              case 1:
-                setRotatTarget(1200);
-                setPathState(2);
+
+            case 1:
+                if (timerCount == -1) {
+                    setRotatTarget(1300);
+                    timer.reset();
+                    timerCount = 0;
+                }
                 break;
-            /*case 2: // Wait until the robot is near the scoring position
+
+            case 2: // Wait until the robot is near the scoring position
                 if (!follower.isBusy()) {
                     follower.setMaxPower(1);
                     follower.followPath(movetofirst);
                     imaTouchU.setPosition(.58);
-                    //setRotatTarget(10);
-                    setpickmeupTarget(10);
+
                     setPathState(2);
                 }
                 break;
@@ -314,7 +332,33 @@ public class PedroRight extends OpMode {
                 if (follower.isBusy()) {
                     follower.followPath(pickspecup, true);
                     setPathState(10);
-                } */
+                }
+
+             */
+                /***** Guy gave this from dscord
+            case 0:
+                follower.followPath(scorePre);
+                rotat.setTargetPosition(1500);
+                setPathState(1);
+            case 1:
+                if(!follower.isBusy()){
+                    rotat.setTargetPosition(1400);
+                    setPathState(2);
+                }
+            case 2:
+                if(Math.abs(rotat.getCurrentPosition() - 1400) < 10){ //if the arm has reached, also we already know the robot is stationary
+                    pathTimer.resetTimer();//ideally ur setState method will do this, and i think the default setPathState does this
+                    imaTouchU.setPosition(.58);
+                    setPathState(3);
+                }
+            case 3:
+                if(pathTimer.getElapsedTimeSeconds() > .250) {
+                    follower.followPath(movetofirst);
+                }
+                //move on with states
+
+            case 4:
+                //move on with states *****/
 
             case 10: // Wait until the robot is near the parking position
                 if (!follower.isBusy()) {
