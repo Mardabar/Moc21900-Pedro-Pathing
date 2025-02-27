@@ -29,7 +29,7 @@ public class PedroRightV1 extends OpMode {
     Servo ankel;
     Servo imaTouchU;
 
-    private ElapsedTime movementTimer = new ElapsedTime();
+    private ElapsedTime timer = new ElapsedTime();
     private final double ticks_in_degree = 537.7; // ticks in degree for 312 motors
     private final double rotat_ticks_in_degree = 3895.9; // ticks in degree for the 43 rpm motor
     static final double COUNTS_PER_MOTOR_REV = 280;
@@ -73,6 +73,11 @@ public class PedroRightV1 extends OpMode {
     private final Pose pushsample3Pose = new Pose(20,13, Math.toRadians(180)); // pushin in the final samp
 
     private final Pose pickupspecPose = new Pose(20,13, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
+    private final Pose pickupspec2Pose = new Pose(13,10, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
+
+    private final Pose linescore2 = new Pose(30,68, Math.toRadians(0));
+
+    private final Pose scorespec2 = new Pose(34,70, Math.toRadians(0));
 
 
 
@@ -86,16 +91,13 @@ public class PedroRightV1 extends OpMode {
     private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90)); // Control point for curved path */
 
     // private Path scorePre, park;
+    double dur = 0;
 
-    private PathChain scorePre, movetofirst, pushinsamps, pickspecup, scorespec;
-
-    private LinearOpMode OpMode;
-    public DcMotor armMotor1, armMotor2, elbow;
-    // public  RunAction toZero, toChamber;
-
-    public Boolean armDone;
+    int timerCount = -1;
     public int pos;
-    public static double p = 0.01, i = 0, d = 0.0001;
+    public static double pR = 0.0085, iR = 0.01, dR = 0.0001;
+    public static double fR = 0;
+    public static double p = 0.00067, i = 0.01, d = 0.0005;
     public static double f = 0;
 
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
@@ -121,6 +123,7 @@ public class PedroRightV1 extends OpMode {
         return rotat.getCurrentPosition();
     }
 
+    private PathChain scorePre, movetofirst, pushinsamps, pickspecup, line2score, score2spec;
 
     public void buildPaths() {
         // Path for scoring preload
@@ -156,8 +159,18 @@ public class PedroRightV1 extends OpMode {
                 .build();
 
         pickspecup = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pushsample3Pose), new Point(pickupspecPose)))
-                .setLinearHeadingInterpolation(pushsample3Pose.getHeading(), pickupspecPose.getHeading())
+                .addPath(new BezierLine(new Point(pushsample3Pose), new Point(pickupspec2Pose)))
+                .setLinearHeadingInterpolation(pushsample3Pose.getHeading(), pickupspec2Pose.getHeading())
+                .build();
+
+        line2score = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(pickupspec2Pose), new Point(linescore2)))
+                .setLinearHeadingInterpolation(pickupspec2Pose.getHeading(), linescore2.getHeading())
+                .build();
+
+        score2spec = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(linescore2), new Point(scorespec2)))
+                .setLinearHeadingInterpolation(linescore2.getHeading(), scorespec2.getHeading())
                 .build();
 
     }
@@ -165,36 +178,74 @@ public class PedroRightV1 extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: // Move from start to scoring position
-                follower.setMaxPower(.8);
-                setRotatTarget(1600);
-                setpickmeupTarget(450);
-                follower.followPath(scorePre);
-                setPathState(1);
+                if (!follower.isBusy() && timerCount == -1) {
+                    follower.setMaxPower(.8);
+                    dur = 200;
+                    timer.reset();
+
+
+                    setRotatTarget(1600);
+                    setpickmeupTarget(450);
+                    follower.followPath(scorePre);
+                    setPathState(1);
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == -1){
+                    timerCount = 0;
+                }
+
+                if (!follower.isBusy() && timerCount == 0) {
+                    dur = 900;
+                    timerCount = -1;
+                    setPathState(1);
+                }
                 break;
 
             case 1: // Wait until the robot is near the scoring position
-                if (!follower.isBusy()) {
-                    follower.setMaxPower(1);
+                if (timerCount == -1) {
+                    timer.reset();
+                    timerCount = 0;
+                    /*follower.setMaxPower(1);
                     follower.followPath(movetofirst);
                     imaTouchU.setPosition(.58);
                     ankel.setPosition(.658);
-                    //setRotatTarget(10);
                     setpickmeupTarget(10);
-                    setPathState(2);
+                    timerCount = 1;
+                    setPathState(2); */
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 0) {
+                    dur = 200;
+                    timerCount = 1;
+                    timer.reset();
+                    imaTouchU.setPosition(.58);
+                    ankel.setPosition(.658);
+                    setpickmeupTarget(10);
+
+                }
+
+                if (timer.milliseconds() >= dur && timerCount == 1) {
+
                 }
                 break;
             case 2: // bot strafes to right of sub zone
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && timerCount == 1) {
                     follower.followPath(pushinsamps);
-                    setpickmeupTarget(200);
+                    setRotatTarget(500);
+                    timerCount = 2;
                     setPathState(3);
                 }
                 break;
             case 3: // bot
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && timerCount == 2) {
                     follower.followPath(pickspecup);
-
+                    timer.reset();
+                    dur = 500;
                     setPathState(4);
+                }
+                if (timer.milliseconds() >= dur && timerCount == 2) {
+                    imaTouchU.setPosition(.16);
+                    setPathState(5);
                 }
                 //break;
                 /*
@@ -285,9 +336,10 @@ public class PedroRightV1 extends OpMode {
         opmodeTimer.resetTimer();
 
         // setting motor pid values
+        // setting motor pid values
         LlinPID = new PIDController(p,i,d);
         RlinPID = new PIDController(p,i,d);
-        rotatPID = new PIDController(p, i, d);
+        rotatPID = new PIDController(pR, iR, dR);
         pickmeupPID = new PIDController(p, i, d);
 
         pickMeUp.setDirection(DcMotor.Direction.REVERSE);
@@ -327,7 +379,7 @@ public class PedroRightV1 extends OpMode {
         autonomousPathUpdate();
         LlinPID.setPID(p,i,d);
         RlinPID.setPID(p,i,d);
-        rotatPID.setPID(p,i,d);
+        rotatPID.setPID(pR,iR,dR);
         pickmeupPID.setPID(p,i,d);
 
         int LlinPos = Llin.getCurrentPosition();
@@ -342,7 +394,7 @@ public class PedroRightV1 extends OpMode {
 
         double Llff = Math.cos(Math.toRadians(LlinTarget / ticks_in_degree)) * f;
         double Rlff = Math.cos(Math.toRadians(RlinTarget / ticks_in_degree)) * f;
-        double rff = Math.cos(Math.toRadians(rotatTarget / rotat_ticks_in_degree)) * f;
+        double rff = Math.cos(Math.toRadians(rotatTarget / rotat_ticks_in_degree)) * fR;
         double mff = Math.cos(Math.toRadians(pickmeupTarget / ticks_in_degree)) * f;
 
         double LlinPower = Llff + Llpid;
