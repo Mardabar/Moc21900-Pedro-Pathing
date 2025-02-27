@@ -22,8 +22,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 @Config
-@Autonomous(name = "Pedro Right", group = "autonomous")
-public class PedroRight extends OpMode {
+@Autonomous(name = "Pedro RightV2", group = "autonomous")
+public class PedroRightV2 extends OpMode {
 
     private DcMotor Rlin = null;
     private DcMotor Llin = null;
@@ -59,7 +59,7 @@ public class PedroRight extends OpMode {
 
     private final Pose strafeto1Pose = new Pose(30,37, Math.toRadians(180));
 
-   // private final Pose turn180Pose = new Pose(30,37, Math.toRadians(180));
+    // private final Pose turn180Pose = new Pose(30,37, Math.toRadians(180));
     private final Pose lineto1Pose = new Pose(56,40, Math.toRadians(180));
     //private final Pose moveto1Pose = new Pose(59, 36, Math.toRadians(0)); // Lining up for sample with beziure curve idk how to spell
     private final Pose linewithsamp1Pose = new Pose(58,28, Math.toRadians(180)); // Strafing to line up with sample again b4 pushing to human player zone
@@ -106,7 +106,7 @@ public class PedroRight extends OpMode {
     private final Pose parkPose = new Pose(60, 98, Math.toRadians(90));    // Parking position
     private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90)); // Control point for curved path */
 
-   // private Path scorePre, park;
+    // private Path scorePre, park;
 
     private PathChain scorePre, movetofirst, pushinsamps, pickspecup, line2score, score2spec;
 
@@ -163,23 +163,23 @@ public class PedroRight extends OpMode {
                 .setLinearHeadingInterpolation(lineto1Pose.getHeading(), linewithsamp1Pose.getHeading())
                 .build();
 
-         pushinsamps = follower.pathBuilder()
-                 .addPath(new BezierLine(new Point(linewithsamp1Pose), new Point(pushsample1Pose)))
-                 .setLinearHeadingInterpolation(linewithsamp1Pose.getHeading(), pushsample1Pose.getHeading())
-                 .addPath(new BezierLine(new Point(pushsample1Pose), new Point(linewithsamp2Pose)))
-                 .setLinearHeadingInterpolation(pushsample1Pose.getHeading(), linewithsamp2Pose.getHeading())
-                 .addPath(new BezierLine(new Point(linewithsamp2Pose), new Point(strafewithsamp2Pose)))
-                 .setLinearHeadingInterpolation(linewithsamp2Pose.getHeading(), strafewithsamp2Pose.getHeading())
-                 .addPath(new BezierLine(new Point(strafewithsamp2Pose),new Point(pushsample2Pose)))
-                 .setLinearHeadingInterpolation(strafewithsamp2Pose.getHeading(), pushsample2Pose.getHeading())
-                 .addPath(new BezierLine(new Point(pushsample2Pose),new Point(linewithsamp3Pose)))
-                 .setLinearHeadingInterpolation(pushsample2Pose.getHeading(), linewithsamp3Pose.getHeading())
-                 .addPath(new BezierLine(new Point(linewithsamp3Pose), new Point(strafewithsamp3Pose)))
-                 .setLinearHeadingInterpolation(linewithsamp3Pose.getHeading(), strafewithsamp3Pose.getHeading())
-                 .addPath(new BezierLine(new Point(strafewithsamp3Pose), new Point(pushsample3Pose)))
-                 .setLinearHeadingInterpolation(strafewithsamp3Pose.getHeading(), pushsample3Pose.getHeading())
+        pushinsamps = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(linewithsamp1Pose), new Point(pushsample1Pose)))
+                .setLinearHeadingInterpolation(linewithsamp1Pose.getHeading(), pushsample1Pose.getHeading())
+                .addPath(new BezierLine(new Point(pushsample1Pose), new Point(linewithsamp2Pose)))
+                .setLinearHeadingInterpolation(pushsample1Pose.getHeading(), linewithsamp2Pose.getHeading())
+                .addPath(new BezierLine(new Point(linewithsamp2Pose), new Point(strafewithsamp2Pose)))
+                .setLinearHeadingInterpolation(linewithsamp2Pose.getHeading(), strafewithsamp2Pose.getHeading())
+                .addPath(new BezierLine(new Point(strafewithsamp2Pose),new Point(pushsample2Pose)))
+                .setLinearHeadingInterpolation(strafewithsamp2Pose.getHeading(), pushsample2Pose.getHeading())
+                .addPath(new BezierLine(new Point(pushsample2Pose),new Point(linewithsamp3Pose)))
+                .setLinearHeadingInterpolation(pushsample2Pose.getHeading(), linewithsamp3Pose.getHeading())
+                .addPath(new BezierLine(new Point(linewithsamp3Pose), new Point(strafewithsamp3Pose)))
+                .setLinearHeadingInterpolation(linewithsamp3Pose.getHeading(), strafewithsamp3Pose.getHeading())
+                .addPath(new BezierLine(new Point(strafewithsamp3Pose), new Point(pushsample3Pose)))
+                .setLinearHeadingInterpolation(strafewithsamp3Pose.getHeading(), pushsample3Pose.getHeading())
 
-                 .build();
+                .build();
 
         pickspecup = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pushsample3Pose), new Point(pickupspec2Pose)))
@@ -198,8 +198,8 @@ public class PedroRight extends OpMode {
 
 
 
-            //gotospec3 = follower.pathBuilder()
-               //.addPath(new BezierLine(new Point(s)))
+        //gotospec3 = follower.pathBuilder()
+        //.addPath(new BezierLine(new Point(s)))
 
     }
 
@@ -220,7 +220,7 @@ public class PedroRight extends OpMode {
                     timerCount = 0;
                 }
 
-              if (!follower.isBusy() && timerCount == 0) {
+                if (!follower.isBusy() && timerCount == 0) {
                     dur = 600;
                     timerCount = -1;
                     setPathState(1);
@@ -370,30 +370,30 @@ public class PedroRight extends OpMode {
                 }
 
              */
-                /***** Guy gave this from dscord
-            case 0:
-                follower.followPath(scorePre);
-                rotat.setTargetPosition(1500);
-                setPathState(1);
-            case 1:
-                if(!follower.isBusy()){
-                    rotat.setTargetPosition(1400);
-                    setPathState(2);
-                }
-            case 2:
-                if(Math.abs(rotat.getCurrentPosition() - 1400) < 10){ //if the arm has reached, also we already know the robot is stationary
-                    pathTimer.resetTimer();//ideally ur setState method will do this, and i think the default setPathState does this
-                    imaTouchU.setPosition(.58);
-                    setPathState(3);
-                }
-            case 3:
-                if(pathTimer.getElapsedTimeSeconds() > .250) {
-                    follower.followPath(movetofirst);
-                }
-                //move on with states
+            /***** Guy gave this from dscord
+             case 0:
+             follower.followPath(scorePre);
+             rotat.setTargetPosition(1500);
+             setPathState(1);
+             case 1:
+             if(!follower.isBusy()){
+             rotat.setTargetPosition(1400);
+             setPathState(2);
+             }
+             case 2:
+             if(Math.abs(rotat.getCurrentPosition() - 1400) < 10){ //if the arm has reached, also we already know the robot is stationary
+             pathTimer.resetTimer();//ideally ur setState method will do this, and i think the default setPathState does this
+             imaTouchU.setPosition(.58);
+             setPathState(3);
+             }
+             case 3:
+             if(pathTimer.getElapsedTimeSeconds() > .250) {
+             follower.followPath(movetofirst);
+             }
+             //move on with states
 
-            case 4:
-                //move on with states *****/
+             case 4:
+             //move on with states *****/
 
             case 10: // Wait until the robot is near the parking position
                 if (!follower.isBusy()) {

@@ -17,15 +17,29 @@ public class PIDF_Arm extends OpMode {
     public PIDController controller;
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
 
-    public static double p = 0, i = 0, d = 0;
+    public static double pR = 0.0085, iR = 0.01, dR = 0.0001;
+    public static double fR = 0;
+    public static double p = 0.00067, i = 0.01, d = 0.0005;
     public static double f = 0;
+    public static double LlinTarget;
+    public static double RlinTarget;
+    public static double rotatTarget;
+    public static double pickmeupTarget;
 
-    public static int LlinTarget = 0;
-    public static int RlinTarget = 0;
-    public static int rotatTarget = 0;
-    public static int pickmeupTarget = 0;
-
+    public void setLlinTarget(double b) {
+        LlinTarget = b;
+    }
+    public void setRlinTarget(double b) {
+        RlinTarget = b;
+    }
+    public void setRotatTarget(double b) {
+        rotatTarget = b;
+    }
+    public void setpickmeupTarget(double b) {
+        pickmeupTarget = b;
+    }
     private final double ticks_in_degree = 537.7;
+    public final double rotat_ticks_in_degree = 3895.9; // ticks in degree for the 43 rpm motor
 
     private DcMotor rotat;
     private DcMotor pickmeup;
@@ -37,6 +51,10 @@ public class PIDF_Arm extends OpMode {
     @Override
     public void init() {
         controller = new PIDController(p,i,d);
+        LlinPID = new PIDController(p,i,d);
+        RlinPID = new PIDController(p,i,d);
+        rotatPID = new PIDController(pR, iR, dR);
+        pickmeupPID = new PIDController(p, i, d);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -51,36 +69,40 @@ public class PIDF_Arm extends OpMode {
     @Override
     public void loop() {
         controller.setPID(p,i,d);
-        int rotatPos = rotat.getCurrentPosition();
-        /*int pickmeupPos = pickmeup.getCurrentPosition();
+        LlinPID.setPID(p,i,d);
+        RlinPID.setPID(p,i,d);
+        rotatPID.setPID(pR,iR,dR);
+        pickmeupPID.setPID(p,i,d);
+
         int LlinPos = Llin.getCurrentPosition();
-        int RlinPos = Rlin.getCurrentPosition(); */
+        int RlinPos = Rlin.getCurrentPosition();
+        int rotatPos = rotat.getCurrentPosition();
+        int pickmeupPos = pickmeup.getCurrentPosition();
 
-
-        double rpid = rotatPID.calculate(rotatPos, rotatTarget);
-        /*double Llpid = LlinPID.calculate(LlinPos, LlinTarget);
+        double Llpid = LlinPID.calculate(LlinPos, LlinTarget);
         double Rlpid = RlinPID.calculate(RlinPos, RlinTarget);
-        double mpid = pickmeupPID.calculate(pickmeupPos, pickmeupTarget); */
+        double rpid = rotatPID.calculate(rotatPos, rotatTarget);
+        double mpid = pickmeupPID.calculate(pickmeupPos, pickmeupTarget);
 
-        double rff = Math.cos(Math.toRadians(rotatTarget / ticks_in_degree)) * f;
-        /*double mff = Math.cos(Math.toRadians(pickmeupTarget / ticks_in_degree)) * f;
         double Llff = Math.cos(Math.toRadians(LlinTarget / ticks_in_degree)) * f;
-        double Rlff = Math.cos(Math.toRadians(RlinTarget / ticks_in_degree)) * f; */
+        double Rlff = Math.cos(Math.toRadians(RlinTarget / ticks_in_degree)) * f;
+        double rff = Math.cos(Math.toRadians(rotatTarget / rotat_ticks_in_degree)) * fR;
+        double mff = Math.cos(Math.toRadians(pickmeupTarget / ticks_in_degree)) * f;
 
-        double rotatPower = rff + rpid;
-        /*double pickmeupPower = mff + mpid;
         double LlinPower = Llff + Llpid;
-        double RlinPower = Rlff + Rlpid; */
+        double RlinPower = Rlff + Rlpid;
+        double rotatPower = rff + rpid;
+        double pickmeupPower = mff + mpid;
 
-        rotat.setPower(rotatPower);
-        /*pickmeup.setPower(pickmeupPower);
         Llin.setPower(LlinPower);
-        Rlin.setPower(RlinPower);*/
+        Rlin.setPower(LlinPower);
+        rotat.setPower(rotatPower);
+        pickmeup.setPower(pickmeupPower);
 
         telemetry.addData("rotat pos", rotatPos);
-        /*telemetry.addData("pickmeup pos", pickmeupPos);
+        telemetry.addData("pickmeup pos", pickmeupPos);
         telemetry.addData("Llin pos", LlinPos);
-        telemetry.addData("Rlin pos", RlinPos); */
+        telemetry.addData("Rlin pos", RlinPos);
         telemetry.update();
 
     }

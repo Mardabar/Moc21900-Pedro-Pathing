@@ -22,8 +22,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 @Config
-@Autonomous(name = "Pedro Right", group = "autonomous")
-public class PedroRight extends OpMode {
+@Autonomous(name = "Pedro RightV3", group = "autonomous")
+public class PedroRightV3 extends OpMode {
 
     private DcMotor Rlin = null;
     private DcMotor Llin = null;
@@ -51,52 +51,53 @@ public class PedroRight extends OpMode {
     private int pathState;
 
     private final Pose startPose = new Pose(8.5, 70, Math.toRadians(0));  // Starting position
-    private final Pose scoreprePose = new Pose(35, 70, Math.toRadians(0)); // Scoring position
+    private final Pose scoreprePose = new Pose(34, 70, Math.toRadians(0)); // Scoring position
     private final Pose linewith1Pose = new Pose(30,70, Math.toRadians(90)); // move robot back a bit after score pre
 
+    //private final Pose cuvrewith1Pose = new Pose()
 
 
 
     private final Pose strafeto1Pose = new Pose(30,37, Math.toRadians(180));
 
-   // private final Pose turn180Pose = new Pose(30,37, Math.toRadians(180));
+    // private final Pose turn180Pose = new Pose(30,37, Math.toRadians(180));
     private final Pose lineto1Pose = new Pose(56,40, Math.toRadians(180));
     //private final Pose moveto1Pose = new Pose(59, 36, Math.toRadians(0)); // Lining up for sample with beziure curve idk how to spell
     private final Pose linewithsamp1Pose = new Pose(58,28, Math.toRadians(180)); // Strafing to line up with sample again b4 pushing to human player zone
     private final Pose pushsample1Pose = new Pose(23,28, Math.toRadians(180)); // Pushes 1st sample to da hmn plyer zone
 
 
-    private final Pose linewithsamp2Pose = new Pose(58,28, Math.toRadians(180)); // Robot goes to 2nd sample using bezuier curve or smth
-    private final Pose strafewithsamp2Pose = new Pose(58,19, Math.toRadians(180));
+    private final Pose linewithsamp2Pose = new Pose(58,20, Math.toRadians(180)); // Robot goes to 2nd sample using bezuier curve or smth
     private final Pose linewithsamp2ControlPose = new Pose(55,43, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES CAUSE DONT HAVE FIELD RN****/
 
-    private final Pose pushsample2Pose = new Pose(23,16, Math.toRadians(180));
+    private final Pose pushsample2Pose = new Pose(23,20, Math.toRadians(180));
 
-    private final Pose linewithsamp3Pose = new Pose(58,16, Math.toRadians(180)); // bot goes to 3rd sample using bezuer curve
 
-    private final Pose strafewithsamp3Pose = new Pose(58,16, Math.toRadians(180));
+    private final Pose linewithsamp3Pose = new Pose(58,15, Math.toRadians(180)); // bot goes to 3rd sample using bezuer curve
+    private final Pose linewithsamp3ControlPose = new Pose(49,40, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES **/
 
-    private final Pose linewithsamp3ControlPose = new Pose(58,10, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES **/
+    private final Pose pushsample3Pose = new Pose(23,15, Math.toRadians(180)); // pushin in the final samp
 
-    private final Pose pushsample3Pose = new Pose(23,10, Math.toRadians(180)); // pushin in the final samp
+    private final Pose pickupspec2Pose = new Pose(26,15, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
 
-    private final Pose pickupspec2Pose = new Pose(13,10, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
-
-    private final Pose pickupspecsPose = new Pose(13,10, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
+    private final Pose pickupspecsPose = new Pose(13,23, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
 
     private final Pose control2 = new Pose(10,64);
-
     private final Pose control3 = new Pose(15,72);
-
     private final Pose linescore2 = new Pose(30,68, Math.toRadians(0));
+    private final Pose scorespec2 = new Pose(38,68, Math.toRadians(0));
 
-    private final Pose scorespec2 = new Pose(34,70, Math.toRadians(0));
 
     private final Pose scorespec3 = new Pose(38,66, Math.toRadians(0));
 
+
     private final Pose scorespec4 = new Pose(38,64, Math.toRadians(0));
 
+
     private final Pose scorespec5 = new Pose(38,62, Math.toRadians(0));
+
+
+
 
 
     private final Pose scorespecPose = new Pose(18, 129, Math.toRadians(180)); // Score sample from in claw
@@ -106,7 +107,7 @@ public class PedroRight extends OpMode {
     private final Pose parkPose = new Pose(60, 98, Math.toRadians(90));    // Parking position
     private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90)); // Control point for curved path */
 
-   // private Path scorePre, park;
+    // private Path scorePre, park;
 
     private PathChain scorePre, movetofirst, pushinsamps, pickspecup, line2score, score2spec;
 
@@ -163,23 +164,18 @@ public class PedroRight extends OpMode {
                 .setLinearHeadingInterpolation(lineto1Pose.getHeading(), linewithsamp1Pose.getHeading())
                 .build();
 
-         pushinsamps = follower.pathBuilder()
-                 .addPath(new BezierLine(new Point(linewithsamp1Pose), new Point(pushsample1Pose)))
-                 .setLinearHeadingInterpolation(linewithsamp1Pose.getHeading(), pushsample1Pose.getHeading())
-                 .addPath(new BezierLine(new Point(pushsample1Pose), new Point(linewithsamp2Pose)))
-                 .setLinearHeadingInterpolation(pushsample1Pose.getHeading(), linewithsamp2Pose.getHeading())
-                 .addPath(new BezierLine(new Point(linewithsamp2Pose), new Point(strafewithsamp2Pose)))
-                 .setLinearHeadingInterpolation(linewithsamp2Pose.getHeading(), strafewithsamp2Pose.getHeading())
-                 .addPath(new BezierLine(new Point(strafewithsamp2Pose),new Point(pushsample2Pose)))
-                 .setLinearHeadingInterpolation(strafewithsamp2Pose.getHeading(), pushsample2Pose.getHeading())
-                 .addPath(new BezierLine(new Point(pushsample2Pose),new Point(linewithsamp3Pose)))
-                 .setLinearHeadingInterpolation(pushsample2Pose.getHeading(), linewithsamp3Pose.getHeading())
-                 .addPath(new BezierLine(new Point(linewithsamp3Pose), new Point(strafewithsamp3Pose)))
-                 .setLinearHeadingInterpolation(linewithsamp3Pose.getHeading(), strafewithsamp3Pose.getHeading())
-                 .addPath(new BezierLine(new Point(strafewithsamp3Pose), new Point(pushsample3Pose)))
-                 .setLinearHeadingInterpolation(strafewithsamp3Pose.getHeading(), pushsample3Pose.getHeading())
-
-                 .build();
+        pushinsamps = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(linewithsamp1Pose), new Point(pushsample1Pose)))
+                .setLinearHeadingInterpolation(linewithsamp1Pose.getHeading(), pushsample1Pose.getHeading())
+                .addPath(new BezierCurve(new Point(pushsample1Pose), new Point(linewithsamp2ControlPose),new Point(linewithsamp2Pose)))
+                .setLinearHeadingInterpolation(pushsample1Pose.getHeading(), linewithsamp2Pose.getHeading())
+                .addPath(new BezierLine(new Point(linewithsamp2Pose), new Point(pushsample2Pose)))
+                .setLinearHeadingInterpolation(linewithsamp2Pose.getHeading(), pushsample2Pose.getHeading())
+                .addPath(new BezierCurve(new Point(pushsample2Pose), new Point(linewithsamp3ControlPose),new Point(linewithsamp3Pose)))
+                .setLinearHeadingInterpolation(pushsample2Pose.getHeading(), linewithsamp3Pose.getHeading())
+                .addPath(new BezierLine(new Point(linewithsamp3Pose), new Point(pushsample3Pose)))
+                .setLinearHeadingInterpolation(linewithsamp3Pose.getHeading(), pushsample3Pose.getHeading())
+                .build();
 
         pickspecup = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pushsample3Pose), new Point(pickupspec2Pose)))
@@ -198,8 +194,8 @@ public class PedroRight extends OpMode {
 
 
 
-            //gotospec3 = follower.pathBuilder()
-               //.addPath(new BezierLine(new Point(s)))
+        //gotospec3 = follower.pathBuilder()
+        //.addPath(new BezierLine(new Point(s)))
 
     }
 
@@ -210,7 +206,7 @@ public class PedroRight extends OpMode {
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scorePre);
                     follower.setMaxPower(.8);
-                    dur = 500;
+                    dur = 200;
                     timer.reset();
 
                     setRotatTarget(1500);
@@ -220,7 +216,7 @@ public class PedroRight extends OpMode {
                     timerCount = 0;
                 }
 
-              if (!follower.isBusy() && timerCount == 0) {
+                if (!follower.isBusy() && timerCount == 0) {
                     dur = 600;
                     timerCount = -1;
                     setPathState(1);
@@ -229,10 +225,9 @@ public class PedroRight extends OpMode {
 
             case 1:
                 if (timerCount == -1) {
-                    setRotatTarget(1100);
+                    setRotatTarget(1300);
                     timer.reset();
                     timerCount = 0;
-                    setPathState(2);
                 }
                 break;
 
@@ -241,49 +236,19 @@ public class PedroRight extends OpMode {
                     follower.setMaxPower(1);
                     follower.followPath(movetofirst);
                     imaTouchU.setPosition(.58);
-                    timerCount = -1;
 
-                    setPathState(3);
+                    setPathState(2);
                 }
                 break;
             case 3: // bot strafes to right of sub zone
-                if (!follower.isBusy() && timerCount == -1) {
+                if (!follower.isBusy()) {
                     follower.followPath(pushinsamps);
-                    dur = 200;
-                    timer.reset();
-                    setRotatTarget(400);
+                    setRotatTarget(500);
                     ankel.setPosition(.62);
                     imaTouchU.setPosition(.58);
-                }
-
-                if (timer.milliseconds() >= dur && timerCount == -1){
-                    timerCount = 0;
-                }
-
-                if (!follower.isBusy() && timerCount == 0){
-                    setPathState(4);
-                    timerCount = -1;
-                }
-                break; /*
-            case 4:
-                if (!follower.isBusy()) {
-                    follower.followPath(pickspecup);
-                    setPathState(5);
+                    setPathState(3);
                 }
                 break;
-            case 5:  // Move from start to scoring position
-                if (!follower.isBusy()) {
-                    follower.followPath(score2spec);
-
-                    setRotatTarget(1500);
-                    ankel.setPosition(.62);
-                    imaTouchU.setPosition(.16);
-                    setPathState(6);
-                }
-                break;
-
-
-                /*
             case 4:
                 if (!follower.isBusy()) {
                     follower.followPath(pickspecup);
@@ -371,29 +336,29 @@ public class PedroRight extends OpMode {
 
              */
                 /***** Guy gave this from dscord
-            case 0:
-                follower.followPath(scorePre);
-                rotat.setTargetPosition(1500);
-                setPathState(1);
-            case 1:
-                if(!follower.isBusy()){
-                    rotat.setTargetPosition(1400);
-                    setPathState(2);
-                }
-            case 2:
-                if(Math.abs(rotat.getCurrentPosition() - 1400) < 10){ //if the arm has reached, also we already know the robot is stationary
-                    pathTimer.resetTimer();//ideally ur setState method will do this, and i think the default setPathState does this
-                    imaTouchU.setPosition(.58);
-                    setPathState(3);
-                }
-            case 3:
-                if(pathTimer.getElapsedTimeSeconds() > .250) {
-                    follower.followPath(movetofirst);
-                }
-                //move on with states
+                 case 0:
+                 follower.followPath(scorePre);
+                 rotat.setTargetPosition(1500);
+                 setPathState(1);
+                 case 1:
+                 if(!follower.isBusy()){
+                 rotat.setTargetPosition(1400);
+                 setPathState(2);
+                 }
+                 case 2:
+                 if(Math.abs(rotat.getCurrentPosition() - 1400) < 10){ //if the arm has reached, also we already know the robot is stationary
+                 pathTimer.resetTimer();//ideally ur setState method will do this, and i think the default setPathState does this
+                 imaTouchU.setPosition(.58);
+                 setPathState(3);
+                 }
+                 case 3:
+                 if(pathTimer.getElapsedTimeSeconds() > .250) {
+                 follower.followPath(movetofirst);
+                 }
+                 //move on with states
 
-            case 4:
-                //move on with states *****/
+                 case 4:
+                 //move on with states *****/
 
             case 10: // Wait until the robot is near the parking position
                 if (!follower.isBusy()) {
@@ -516,8 +481,6 @@ public class PedroRight extends OpMode {
         telemetry.addData("heading", follower.getTotalHeading());
         telemetry.addData("rotat pos", rotatPos);
         telemetry.addData("rotat target pos", rotatTarget);
-        telemetry.addData("currentPath", follower.getCurrentPath()); // VERY IMPORTANT
-        telemetry.addData("isBusy", follower.isBusy()); //Check to see if isBusy is false prematurly
         telemetry.update();
     }
 
@@ -534,4 +497,3 @@ public class PedroRight extends OpMode {
     public void stop() {
     }
 }
-

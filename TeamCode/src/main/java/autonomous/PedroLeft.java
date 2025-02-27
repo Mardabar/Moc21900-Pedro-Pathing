@@ -52,11 +52,12 @@ public class PedroLeft extends OpMode {
     private int pathState;
 
     private final Pose startPose = new Pose(8.20, 104.20, Math.toRadians(90));  // Starting position
-    private final Pose scorePose = new Pose(15.45, 129.36, Math.toRadians(135)); // Scoring position
+    private final Pose scorePose = new Pose(16.95, 126.96, Math.toRadians(135)); // Scoring position
+    private final Pose score2Pose = new Pose(19.55, 126.96, Math.toRadians(135));
 
-    private final Pose lineSamp2Pose = new Pose(31, 118.36, Math.toRadians(0)); // move robot back a bit after score pre
-    private final Pose lineSamp3Pose = new Pose(31, 128.36, Math.toRadians(0));
-    private final Pose lineSamp4Pose = new Pose(38.52, 131.82, Math.toRadians(42));
+    private final Pose lineSamp2Pose = new Pose(30, 118.36, Math.toRadians(0)); // move robot back a bit after score pre
+    private final Pose lineSamp3Pose = new Pose(30, 127.18, Math.toRadians(0));
+    private final Pose lineSamp4Pose = new Pose(34.52, 134.12, Math.toRadians(30));
 
     private final Pose finishPose = new Pose(59.36, 108.18, Math.toRadians(-90));
     private final Pose finishControlPose = new Pose(57.72, 129.01, Math.toRadians(-90));
@@ -150,13 +151,13 @@ public class PedroLeft extends OpMode {
                 .build();
 
         scoreSecondSamp = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(lineSamp2Pose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(lineSamp2Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(lineSamp2Pose), new Point(score2Pose)))
+                .setLinearHeadingInterpolation(lineSamp2Pose.getHeading(), score2Pose.getHeading())
                 .build();
 
         pickThirdSamp = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scorePose), new Point(lineSamp3Pose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), lineSamp3Pose.getHeading())
+                .addPath(new BezierLine(new Point(score2Pose), new Point(lineSamp3Pose)))
+                .setLinearHeadingInterpolation(score2Pose.getHeading(), lineSamp3Pose.getHeading())
                 .build();
 
         scoreThirdSamp = follower.pathBuilder()
@@ -190,9 +191,10 @@ public class PedroLeft extends OpMode {
                     timer.reset();
 
                     imaTouchU.setPosition(0.13);
-                    setLlinTarget(3200);
-                    setRlinTarget(3200);
+                    setLlinTarget(3400);
+                    setRlinTarget(3400);
                     setRotatTarget(2200);
+                    //setpickmeupTarget(80);
                     ankel.setPosition(0.568);
                 }
 
@@ -295,8 +297,8 @@ public class PedroLeft extends OpMode {
                     dur = 200;
                     timer.reset();
 
-                    setLlinTarget(3200);
-                    setRlinTarget(3200);
+                    setLlinTarget(3400);
+                    setRlinTarget(3400);
                     setRotatTarget(2200);
                     ankel.setPosition(0.568);
                 }
@@ -400,9 +402,9 @@ public class PedroLeft extends OpMode {
                     dur = 200;
                     timer.reset();
 
-                    setLlinTarget(3200);
-                    setRlinTarget(3200);
-                    setRotatTarget(1800);
+                    setLlinTarget(3400);
+                    setRlinTarget(3400);
+                    setRotatTarget(2200);
                     ankel.setPosition(0.568);
                 }
 
@@ -505,9 +507,9 @@ public class PedroLeft extends OpMode {
                     dur = 200;
                     timer.reset();
 
-                    setLlinTarget(3200);
-                    setRlinTarget(3200);
-                    setRotatTarget(1800);
+                    setLlinTarget(3400);
+                    setRlinTarget(3400);
+                    setRotatTarget(2200);
                     ankel.setPosition(0.568);
                 }
 
@@ -554,7 +556,7 @@ public class PedroLeft extends OpMode {
 
                     setLlinTarget(800);
                     setRlinTarget(800);
-                    setRotatTarget(100);
+                    setRotatTarget(300);
                     ankel.setPosition(0.567);
 
                     setPathState(15);
@@ -616,6 +618,17 @@ public class PedroLeft extends OpMode {
         Rlin.setDirection(DcMotor.Direction.FORWARD);
         rotat.setDirection(DcMotor.Direction.FORWARD);
 
+
+        pickMeUp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Llin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotat.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        pickMeUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Llin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotat.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         clampClaw();
         moveClaw();
         ankel.setPosition(.6); // was .658
@@ -668,6 +681,10 @@ public class PedroLeft extends OpMode {
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("rotat pos", rotatPos);
+        telemetry.addData("rotat target pos", rotatTarget);
+        telemetry.addData("pickmeup pos", pickmeupPos);
+        telemetry.addData("pickmeup target pos", pickmeupTarget);
         telemetry.addData("heading", follower.getTotalHeading());
         telemetry.update();
     }
