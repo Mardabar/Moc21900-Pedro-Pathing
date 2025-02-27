@@ -95,10 +95,10 @@ public class PedroRightV1 extends OpMode {
 
     int timerCount = -1;
     public int pos;
-    public static double pR = 0.0085, iR = 0.01, dR = 0.0001;
-    public static double fR = 0;
-    public static double p = 0.00067, i = 0.01, d = 0.0005;
-    public static double f = 0;
+    public static double pR = 0.0085, iR = 0.01, dR = 0.000083;
+    public static double fR = 0.1;
+    public static double p = 0.0025, i = 0.01, d = 0.000001;
+    public static double f = 0.1;
 
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
     public static double LlinTarget;

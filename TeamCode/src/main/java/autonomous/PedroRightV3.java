@@ -95,11 +95,10 @@ public class PedroRightV3 extends OpMode {
 
     int timerCount = -1;
     public int pos;
-    public static double pR = 0.0085, iR = 0.01, dR = 0.0001;
-    public static double fR = 0;
-    public static double p = 0.00067, i = 0.01, d = 0.0005;
-    public static double f = 0;
-
+    public static double pR = 0.0085, iR = 0.01, dR = 0.000083;
+    public static double fR = 0.1;
+    public static double p = 0.0025, i = 0.01, d = 0.000001;
+    public static double f = 0.1;
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
     public static double LlinTarget;
     public static double RlinTarget;
@@ -188,8 +187,8 @@ public class PedroRightV3 extends OpMode {
                     //setpickmeupTarget(450);
                     timerCount = 1;
                     follower.followPath(scorePre);
-                    setPathState(1);
                 }
+
                 if (timerCount == 1 &&  timer.milliseconds() >= dur /* or try if follower is busy here instead of timer check*/ ) {
                     setpickmeupTarget(450);
                     dur = 200;
@@ -207,7 +206,7 @@ public class PedroRightV3 extends OpMode {
                 if (timer.milliseconds() >= dur && timerCount == 3){
                     timerCount = 0;
                     setpickmeupTarget(10);
-                    setPathState(2); //ooga booga
+                    setPathState(1); //ooga booga
                 }
                 break;
             case 1:
@@ -217,7 +216,7 @@ public class PedroRightV3 extends OpMode {
                     ankel.setPosition(.658);
                     timerCount = 1;
                     follower.followPath(pushinsamps);
-                    setPathState(3);
+                    setPathState(2);
                 }
                 break;
 

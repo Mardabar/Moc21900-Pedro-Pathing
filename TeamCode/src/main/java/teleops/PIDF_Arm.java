@@ -17,10 +17,10 @@ public class PIDF_Arm extends OpMode {
     public PIDController controller;
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
 
-    public static double pR = 0.0085, iR = 0.01, dR = 0.0001;
-    public static double fR = 0;
-    public static double p = 0.00067, i = 0.01, d = 0.0005;
-    public static double f = 0;
+    public static double pR = 0.0085, iR = 0.01, dR = 0.000083;
+    public static double fR = 0.1;
+    public static double p = 0.0025, i = 0.01, d = 0.000001;
+    public static double f = 0.1;
     public static double LlinTarget;
     public static double RlinTarget;
     public static double rotatTarget;
@@ -64,6 +64,21 @@ public class PIDF_Arm extends OpMode {
         Llin = hardwareMap.get(DcMotorEx.class, "Llin");
         Rlin = hardwareMap.get(DcMotorEx.class, "Rlin");
 
+
+        pickmeup.setDirection(DcMotor.Direction.REVERSE);
+        Llin.setDirection(DcMotor.Direction.REVERSE);
+        Rlin.setDirection(DcMotor.Direction.FORWARD);
+        rotat.setDirection(DcMotor.Direction.FORWARD);
+
+        pickmeup.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Llin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotat.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        pickmeup.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Llin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotat.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override

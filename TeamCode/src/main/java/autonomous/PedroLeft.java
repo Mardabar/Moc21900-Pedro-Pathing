@@ -38,6 +38,7 @@ public class PedroLeft extends OpMode {
 
     private ElapsedTime movementTimer = new ElapsedTime();
     private final double ticks_in_degree = 537.7;
+    public final double rotat_ticks_in_degree = 3895.9; // ticks in degree for the 43 rpm motor
     static final double COUNTS_PER_MOTOR_REV = 280;
     static final double DRIVE_GEAR_REDUCTION = 2.95;
     static final double WHEEL_DIAMETER_INCHES = 4.0;
@@ -52,12 +53,14 @@ public class PedroLeft extends OpMode {
     private int pathState;
 
     private final Pose startPose = new Pose(8.20, 104.20, Math.toRadians(90));  // Starting position
-    private final Pose scorePose = new Pose(16.95, 126.96, Math.toRadians(135)); // Scoring position
-    private final Pose score2Pose = new Pose(19.55, 126.96, Math.toRadians(135));
+    private final Pose scorePose = new Pose(13.65, 130.76, Math.toRadians(135)); // Scoring position
+    private final Pose score2Pose = new Pose(13.95, 130.36, Math.toRadians(135));
 
-    private final Pose lineSamp2Pose = new Pose(30, 118.36, Math.toRadians(0)); // move robot back a bit after score pre
+    private final Pose lineSamp2Pose = new Pose(30, 117.86, Math.toRadians(0)); // move robot back a bit after score pre
     private final Pose lineSamp3Pose = new Pose(30, 127.18, Math.toRadians(0));
-    private final Pose lineSamp4Pose = new Pose(34.52, 134.12, Math.toRadians(30));
+    private final Pose lineSamp4Pose = new Pose(33.10, 131.27, Math.toRadians(16));
+    private final Pose lineSamp4ControlPose = new Pose(27.09, 101.63, Math.toRadians(16));
+
 
     private final Pose finishPose = new Pose(59.36, 108.18, Math.toRadians(-90));
     private final Pose finishControlPose = new Pose(57.72, 129.01, Math.toRadians(-90));
@@ -109,8 +112,10 @@ public class PedroLeft extends OpMode {
     public PIDController PickmeupPID, elbowPID;
     public Boolean armDone;
     public int pos;
-    public static double p = 0.01, i = 0, d = 0.0001;
-    public static double f = 0;
+    public static double pR = 0.0085, iR = 0.01, dR = 0.000083;
+    public static double fR = 0.1;
+    public static double p = 0.0025, i = 0.01, d = 0.000001;
+    public static double f = 0.1;
 
     public PIDController LlinPID, rotatPID, pickmeupPID, RlinPID;
     public static double LlinTarget;
@@ -166,7 +171,7 @@ public class PedroLeft extends OpMode {
                 .build();
 
         pickFourthSamp = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scorePose), new Point(lineSamp4Pose)))
+                .addPath(new BezierCurve(new Point(scorePose), new Point(lineSamp4ControlPose), new Point(lineSamp4Pose)))
                 .setLinearHeadingInterpolation(scorePose.getHeading(), lineSamp4Pose.getHeading())
                 .build();
 
@@ -186,7 +191,7 @@ public class PedroLeft extends OpMode {
             case 0:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreFirstSamp);
-                    follower.setMaxPower(0.6);
+                    follower.setMaxPower(0.75);
                     dur = 200;
                     timer.reset();
 
@@ -237,7 +242,7 @@ public class PedroLeft extends OpMode {
             case 2:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(pickSecondSamp);
-                    follower.setMaxPower(0.8);
+                    follower.setMaxPower(0.9);
                     dur = 200;
                     timer.reset();
 
@@ -293,7 +298,7 @@ public class PedroLeft extends OpMode {
             case 4:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreSecondSamp);
-                    follower.setMaxPower(0.6);
+                    follower.setMaxPower(0.75);
                     dur = 200;
                     timer.reset();
 
@@ -342,7 +347,7 @@ public class PedroLeft extends OpMode {
             case 6:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(pickThirdSamp);
-                    follower.setMaxPower(0.8);
+                    follower.setMaxPower(0.9);
                     dur = 200;
                     timer.reset();
 
@@ -398,7 +403,7 @@ public class PedroLeft extends OpMode {
             case 8: // bot should move to first samp ready to push
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreThirdSamp);
-                    follower.setMaxPower(0.6);
+                    follower.setMaxPower(0.75);
                     dur = 200;
                     timer.reset();
 
@@ -447,7 +452,7 @@ public class PedroLeft extends OpMode {
             case 10: //bot lines up w sample
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(pickFourthSamp);
-                    follower.setMaxPower(0.8);
+                    follower.setMaxPower(0.9);
                     dur = 200;
                     timer.reset();
 
@@ -503,7 +508,7 @@ public class PedroLeft extends OpMode {
             case 12:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreFourthSamp);
-                    follower.setMaxPower(0.6);
+                    follower.setMaxPower(0.75);
                     dur = 200;
                     timer.reset();
 
@@ -610,14 +615,13 @@ public class PedroLeft extends OpMode {
         // setting motor pid values
         LlinPID = new PIDController(p,i,d);
         RlinPID = new PIDController(p,i,d);
-        rotatPID = new PIDController(p, i, d);
+        rotatPID = new PIDController(pR, iR, dR);
         pickmeupPID = new PIDController(p, i, d);
 
         pickMeUp.setDirection(DcMotor.Direction.REVERSE);
         Llin.setDirection(DcMotor.Direction.REVERSE);
         Rlin.setDirection(DcMotor.Direction.FORWARD);
         rotat.setDirection(DcMotor.Direction.FORWARD);
-
 
         pickMeUp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Llin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -649,7 +653,7 @@ public class PedroLeft extends OpMode {
         autonomousPathUpdate();
         LlinPID.setPID(p,i,d);
         RlinPID.setPID(p,i,d);
-        rotatPID.setPID(p,i,d);
+        rotatPID.setPID(pR,iR,dR);
         pickmeupPID.setPID(p,i,d);
 
         int LlinPos = Llin.getCurrentPosition();
@@ -664,7 +668,7 @@ public class PedroLeft extends OpMode {
 
         double Llff = Math.cos(Math.toRadians(LlinTarget / ticks_in_degree)) * f;
         double Rlff = Math.cos(Math.toRadians(RlinTarget / ticks_in_degree)) * f;
-        double rff = Math.cos(Math.toRadians(rotatTarget / ticks_in_degree)) * f;
+        double rff = Math.cos(Math.toRadians(rotatTarget / rotat_ticks_in_degree)) * fR;
         double mff = Math.cos(Math.toRadians(pickmeupTarget / ticks_in_degree)) * f;
 
         double LlinPower = Llff + Llpid;
