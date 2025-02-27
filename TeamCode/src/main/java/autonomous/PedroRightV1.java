@@ -225,29 +225,50 @@ public class PedroRightV1 extends OpMode {
                 }
 
                 if (timer.milliseconds() >= dur && timerCount == 1) {
-
+                    setPathState(2);
+                    timerCount = -1;
                 }
                 break;
+
             case 2: // bot strafes to right of sub zone
-                if (!follower.isBusy() && timerCount == 1) {
+                if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(pushinsamps);
                     setRotatTarget(500);
-                    timerCount = 2;
+                    timerCount = 0;
                     setPathState(3);
                 }
                 break;
             case 3: // bot
-                if (!follower.isBusy() && timerCount == 2) {
+                if (!follower.isBusy() && timerCount == 0) {
                     follower.followPath(pickspecup);
+                    dur = 200;
                     timer.reset();
-                    dur = 500;
-                    setPathState(4);
+                    timerCount = 2;
                 }
+
                 if (timer.milliseconds() >= dur && timerCount == 2) {
                     imaTouchU.setPosition(.16);
-                    setPathState(5);
+                    dur = 300;
+                    timerCount = 3;
                 }
-                //break;
+
+                if (timerCount == 3 && timer.milliseconds() >= dur) {
+                    setPathState(4);
+                    timerCount = 0;
+                }
+                break;
+
+            case 4:
+                if (timerCount == 0) {
+                    setRotatTarget(1600);
+                    setpickmeupTarget(450);
+                    ankel.setPosition(.658); // was .658
+                    imaTouchU.setPosition(.16);
+
+                    timer.reset();
+                    timerCount = -1;
+                    dur = 300;
+                }
                 /*
             case 4: // bot should move to first samp ready to push
                 if (!follower.isBusy()) {
