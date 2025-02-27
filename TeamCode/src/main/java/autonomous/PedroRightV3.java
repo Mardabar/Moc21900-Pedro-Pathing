@@ -207,7 +207,7 @@ public class PedroRightV3 extends OpMode {
                 if (timer.milliseconds() >= dur && timerCount == 3){
                     timerCount = 0;
                     setpickmeupTarget(10);
-                    setPathState(2);
+                    setPathState(2); //ooga booga
                 }
                 break;
             case 1:
