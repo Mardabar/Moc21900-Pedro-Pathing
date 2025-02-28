@@ -56,7 +56,7 @@ public class PedroLeft extends OpMode {
     private final Pose scorePose = new Pose(13.65, 130.76, Math.toRadians(135)); // Scoring position
     private final Pose score2Pose = new Pose(13.95, 130.36, Math.toRadians(135));
 
-    private final Pose lineSamp2Pose = new Pose(30, 117.86, Math.toRadians(0)); // move robot back a bit after score pre
+    private final Pose lineSamp2Pose = new Pose(30, 118.56, Math.toRadians(0)); // move robot back a bit after score pre
     private final Pose lineSamp3Pose = new Pose(30, 127.18, Math.toRadians(0));
     private final Pose lineSamp4Pose = new Pose(33.10, 131.27, Math.toRadians(16));
     private final Pose lineSamp4ControlPose = new Pose(27.09, 101.63, Math.toRadians(16));
@@ -191,7 +191,7 @@ public class PedroLeft extends OpMode {
             case 0:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreFirstSamp);
-                    follower.setMaxPower(0.75);
+                    follower.setMaxPower(0.8);
                     dur = 200;
                     timer.reset();
 
@@ -229,7 +229,7 @@ public class PedroLeft extends OpMode {
                 }
                 if (timer.milliseconds() >= dur && timerCount == 1){
                     setpickmeupTarget(80);
-                    dur = 900;
+                    dur = 600;
                     timerCount = 2;
                     timer.reset();
                 }
@@ -285,7 +285,7 @@ public class PedroLeft extends OpMode {
                 if (timer.milliseconds() >= dur && timerCount == 2){
                     setRotatTarget(300);
                     setpickmeupTarget(80);
-                    dur = 900;
+                    dur = 600;
                     timerCount = 3;
                     timer.reset();
                 }
@@ -298,7 +298,7 @@ public class PedroLeft extends OpMode {
             case 4:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreSecondSamp);
-                    follower.setMaxPower(0.75);
+                    follower.setMaxPower(0.8);
                     dur = 200;
                     timer.reset();
 
@@ -334,7 +334,7 @@ public class PedroLeft extends OpMode {
                 }
                 if (timer.milliseconds() >= dur && timerCount == 1){
                     setpickmeupTarget(80);
-                    dur = 900;
+                    dur = 600;
                     timerCount = 2;
                     timer.reset();
                 }
@@ -390,7 +390,7 @@ public class PedroLeft extends OpMode {
                 if (timer.milliseconds() >= dur && timerCount == 2){
                     setRotatTarget(300);
                     setpickmeupTarget(80);
-                    dur = 900;
+                    dur = 600;
                     timerCount = 3;
                     timer.reset();
                 }
@@ -403,7 +403,7 @@ public class PedroLeft extends OpMode {
             case 8: // bot should move to first samp ready to push
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreThirdSamp);
-                    follower.setMaxPower(0.75);
+                    follower.setMaxPower(0.8);
                     dur = 200;
                     timer.reset();
 
@@ -439,7 +439,7 @@ public class PedroLeft extends OpMode {
                 }
                 if (timer.milliseconds() >= dur && timerCount == 1){
                     setpickmeupTarget(80);
-                    dur = 900;
+                    dur = 600;
                     timerCount = 2;
                     timer.reset();
                 }
@@ -495,7 +495,7 @@ public class PedroLeft extends OpMode {
                 if (timer.milliseconds() >= dur && timerCount == 2){
                     setRotatTarget(300);
                     setpickmeupTarget(80);
-                    dur = 900;
+                    dur = 600;
                     timerCount = 3;
                     timer.reset();
                 }
@@ -508,7 +508,7 @@ public class PedroLeft extends OpMode {
             case 12:
                 if (!follower.isBusy() && timerCount == -1) {
                     follower.followPath(scoreFourthSamp);
-                    follower.setMaxPower(0.75);
+                    follower.setMaxPower(0.8);
                     dur = 200;
                     timer.reset();
 
@@ -544,7 +544,7 @@ public class PedroLeft extends OpMode {
                 }
                 if (timer.milliseconds() >= dur && timerCount == 1){
                     setpickmeupTarget(80);
-                    dur = 900;
+                    dur = 600;
                     timerCount = 2;
                     timer.reset();
                 }
