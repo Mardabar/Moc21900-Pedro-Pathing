@@ -166,8 +166,8 @@ public class PedroRightOg extends OpMode {
             case 0: // Move from start to scoring position
                 follower.followPath(scorePre);
                 follower.setMaxPower(.8);
-                setRotatTarget(950);
-                setpickmeupTarget(500);
+                setRotatTarget(1400);
+                setpickmeupTarget(400);
                 setPathState(1);
                 break;
 
@@ -177,7 +177,7 @@ public class PedroRightOg extends OpMode {
                     follower.followPath(movetofirst);
                     imaTouchU.setPosition(.58);
                     ankel.setPosition(.658);
-                    setRotatTarget(300);
+                    setRotatTarget(500);
                     setpickmeupTarget(10);
                     setPathState(2);
                 }
@@ -293,6 +293,16 @@ public class PedroRightOg extends OpMode {
         Llin.setDirection(DcMotor.Direction.REVERSE);
         Rlin.setDirection(DcMotor.Direction.FORWARD);
         rotat.setDirection(DcMotor.Direction.FORWARD);
+
+        pickMeUp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Llin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotat.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        pickMeUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Llin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Rlin.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotat.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         clampClaw();
         moveClaw();

@@ -28,6 +28,9 @@ public class PedroRightV3 extends OpMode {
     private DcMotor rotat = null;
     Servo ankel;
     Servo imaTouchU;
+    double dur = 1200;
+
+    int timerCount = -1;
 
     private ElapsedTime timer = new ElapsedTime();
     private final double ticks_in_degree = 537.7; // ticks in degree for 312 motors
@@ -58,19 +61,19 @@ public class PedroRightV3 extends OpMode {
     // private final Pose turn180Pose = new Pose(30,37, Math.toRadians(180));
     private final Pose lineto1Pose = new Pose(56,40, Math.toRadians(180));
     //private final Pose moveto1Pose = new Pose(59, 36, Math.toRadians(0)); // Lining up for sample with beziure curve idk how to spell
-    private final Pose linewithsamp1Pose = new Pose(62,28, Math.toRadians(180)); // Strafing to line up with sample again b4 pushing to human player zone
-    private final Pose pushsample1Pose = new Pose(20,28, Math.toRadians(180)); // Pushes 1st sample to da hmn plyer zone
+    private final Pose linewithsamp1Pose = new Pose(58,28, Math.toRadians(180)); // Strafing to line up with sample again b4 pushing to human player zone
+    private final Pose pushsample1Pose = new Pose(23,28, Math.toRadians(180)); // Pushes 1st sample to da hmn plyer zone
 
 
-    private final Pose linewithsamp2Pose = new Pose(59,24, Math.toRadians(180)); // Robot goes to 2nd sample using bezuier curve or smth
+    private final Pose linewithsamp2Pose = new Pose(58,28, Math.toRadians(180)); // Robot goes to 2nd sample using bezuier curve or smth
     private final Pose linewithsamp2ControlPose = new Pose(55,43, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES CAUSE DONT HAVE FIELD RN****/
 
-    private final Pose pushsample2Pose = new Pose(20,24, Math.toRadians(180));
+    private final Pose pushsample2Pose = new Pose(23,16, Math.toRadians(180));
 
 
-    private final Pose linewithsamp3Pose = new Pose(64,13, Math.toRadians(180)); // bot goes to 3rd sample using bezuer curve
+    private final Pose linewithsamp3Pose = new Pose(58,16, Math.toRadians(180)); // bot goes to 3rd sample using bezuer curve
     private final Pose linewithsamp3ControlPose = new Pose(49,40, Math.toRadians(180)); /**** Using this bezieur curve EXPECT TO CHANGE THESE VALUES **/
-    private final Pose pushsample3Pose = new Pose(20,13, Math.toRadians(180)); // pushin in the final samp
+    private final Pose pushsample3Pose = new Pose(23,10, Math.toRadians(180)); // pushin in the final samp
 
     private final Pose pickupspecPose = new Pose(20,13, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
     private final Pose pickupspec2Pose = new Pose(13,10, Math.toRadians(180)); // this picks up specimin from human play zone use multiple times
@@ -91,9 +94,6 @@ public class PedroRightV3 extends OpMode {
     private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90)); // Control point for curved path */
 
     // private Path scorePre, park;
-    double dur = 0;
-
-    int timerCount = -1;
     public int pos;
     public static double pR = 0.0085, iR = 0.01, dR = 0.000083;
     public static double fR = 0.1;
@@ -183,14 +183,14 @@ public class PedroRightV3 extends OpMode {
                     timer.reset();
 
 
-                    setRotatTarget(1600);
+                    setRotatTarget(1400);
                     //setpickmeupTarget(450);
                     timerCount = 1;
                     follower.followPath(scorePre);
                 }
 
                 if (timerCount == 1 &&  timer.milliseconds() >= dur /* or try if follower is busy here instead of timer check*/ ) {
-                    setpickmeupTarget(450);
+                    setpickmeupTarget(400);
                     dur = 200;
                     timerCount = 2;
                     timer.reset();
@@ -204,33 +204,42 @@ public class PedroRightV3 extends OpMode {
                 }
 
                 if (timer.milliseconds() >= dur && timerCount == 3){
-                    timerCount = 0;
+                    timerCount = 4;
                     setpickmeupTarget(10);
                     setPathState(1); //ooga booga
                 }
                 break;
             case 1:
-                if (timerCount == 0 && follower.isBusy() ) {
+                if (timerCount == 4) {
                     setRotatTarget(500);
                     imaTouchU.setPosition(.58);
                     ankel.setPosition(.658);
-                    timerCount = 1;
-                    follower.followPath(pushinsamps);
+                    timerCount = 5;
+                    follower.followPath(movetofirst);
                     setPathState(2);
                 }
                 break;
 
             case 2:
-                if (timerCount == 1 && follower.isBusy()) {
+                if (timerCount == 5) {
+                    follower.followPath(pushinsamps);
+                    timerCount = 6;
+                    setPathState(3);
+                }
+
+            case 3:
+                if (timerCount == 6) {
                     follower.followPath(pickspec1up);
                     timer.reset();
                     dur = 500;
-                    timerCount = 2;
+                    timerCount = 7;
                 }
 
-                if (timer.milliseconds() >= dur && timerCount == 2) {
+                if (timer.milliseconds() >= dur && timerCount == 6) {
                     imaTouchU.setPosition(.16);
+                    setPathState(4);
                 }
+                break;
 
 
             case 10: // Wait until the robot is near the parking position
